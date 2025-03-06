@@ -2,9 +2,6 @@
 
 An interactive game teaching business etiquette across cultures.
 
-![Game Logo](images/![Roblox-PNG-Clipart](https://github.com/user-attachments/assets/d4046117-b344-480d-a2e6-9ef75ee2764c)
-)
-
 ## Quick Start
 
 1. Open Roblox
