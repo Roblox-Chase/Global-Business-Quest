@@ -2,7 +2,8 @@
 
 An interactive game teaching business etiquette across cultures.
 
-![Game Logo](images/logo.png)
+![Game Logo](images/![Roblox-PNG-Clipart](https://github.com/user-attachments/assets/d4046117-b344-480d-a2e6-9ef75ee2764c)
+)
 
 ## Quick Start
 
@@ -12,8 +13,8 @@ An interactive game teaching business etiquette across cultures.
 
 ## Demo Controls
 
-- Mouse/Touch**: Select options, navigate menus
-- Keyboard**: Arrow keys to navigate, Enter to select
+- Mouse/Touch: Select options, navigate menus
+- Keyboard: Arrow keys to navigate, Enter to select
 - ESC: Pause game/access menu
 
 ## Demo Content
