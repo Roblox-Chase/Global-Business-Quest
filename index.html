@@ -1,1 +1,79 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Business Quest</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    canvas {
+      display: block;
+    }
+    
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #3498db;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      z-index: 999;
+    }
+    
+    #loading-bar-container {
+      width: 50%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    
+    #loading-bar {
+      height: 100%;
+      width: 0%;
+      background: white;
+      border-radius: 10px;
+      transition: width 0.3s;
+    }
+    
+    .prompt {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    
+    #ui-container button:hover {
+      background: #365d8d !important;
+    }
+    
+    #continue-button:hover {
+      background: #365d8d !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-screen">
+    <h1>Global Business Quest</h1>
+    <p>Learn international business etiquette through interactive scenarios</p>
+    <div id="loading-bar-container">
+      <div id="loading-bar"></div>
+    </div>
+  </div>
+  
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.157.0/three.module.js",
+        "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/controls/OrbitControls.js",
+        "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
