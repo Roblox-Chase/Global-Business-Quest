@@ -1,1 +1,231 @@
+/* Global Business Quest - Main Stylesheet */
 
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  overflow: hidden;
+}
+
+/* Loading screen */
+#loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #3498db, #2c3e50);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  z-index: 999;
+  text-align: center;
+}
+
+#loading-screen h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#loading-screen p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  max-width: 80%;
+}
+
+#loading-bar-container {
+  width: 50%;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#loading-bar {
+  height: 100%;
+  width: 0%;
+  background: white;
+  border-radius: 10px;
+  transition: width 0.3s ease-out;
+}
+
+/* Game UI containers */
+#ui-container {
+  font-size: 16px;
+}
+
+#country-selection {
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#country-selection h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+#country-selection p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.country-button {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.country-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Scenario UI */
+#scenario-ui {
+  max-width: 800px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+#scenario-ui h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+#scenario-ui p {
+  margin-bottom: 1rem;
+}
+
+.prompt {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  color: #2c3e50;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-button {
+  padding: 12px 20px;
+  background-color: #4c72b0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.1s;
+  text-align: left;
+}
+
+.option-button:hover {
+  background-color: #365d8d;
+  transform: translateY(-2px);
+}
+
+.option-button:active {
+  transform: translateY(0);
+}
+
+/* Feedback UI */
+#feedback-ui {
+  max-width: 600px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#feedback-ui h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+#feedback-ui p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+#continue-button {
+  padding: 12px 30px;
+  background-color: #4c72b0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 1rem;
+}
+
+#continue-button:hover {
+  background-color: #365d8d;
+  transform: translateY(-2px);
+}
+
+#continue-button:active {
+  transform: translateY(0);
+}
+
+/* Score display */
+#score-display {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#score-display h3 {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #loading-screen h1 {
+    font-size: 2rem;
+  }
+  
+  #loading-bar-container {
+    width: 80%;
+  }
+  
+  #country-selection, #scenario-ui, #feedback-ui {
+    width: 90%;
+    max-width: 90%;
+  }
+  
+  .option-button {
+    padding: 15px;
+    font-size: 1rem;
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
