@@ -4,6 +4,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { InteractionManager, enhancedInteractions } from './js/interactions.js';
+import { ScenarioManager, additionalScenarios } from './js/scenarios.js';
+import { UIManager } from './js/ui.js';
+import { TokyoOfficeEnvironment } from './js/countries/TokyoOfficeEnvironment.js';
+import { ParisRestaurantEnvironment } from './js/countries/ParisRestaurantEnvironment.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
