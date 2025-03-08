@@ -135,7 +135,7 @@ Global Business Quest is designed for:
 - **Cultural Studies**: Practical application of intercultural communication theories
 
 ## Contact
-For questions, suggestions, or collaboration opportunities, please contact:
+For questions, suggestions, or collaboration opportunities, please contact Chase Smith:
 
 Email: robloxmanmail601@gmail.com
 Project repo: github.com/roblox-chase/global-business-quest
