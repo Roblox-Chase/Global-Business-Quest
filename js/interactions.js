@@ -2,6 +2,8 @@
 // This file handles player interactions and cultural learning feedback
 
 import * as THREE from 'three';
+import { TokyoOfficeEnvironment } from './countries/TokyoOfficeEnvironment.js';
+import { ParisRestaurantEnvironment } from './countries/ParisRestaurantEnvironment.js';
 
 // InteractionManager handles all user interactions within the game scenarios
 export class InteractionManager {
