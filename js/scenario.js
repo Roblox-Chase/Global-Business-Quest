@@ -59,9 +59,6 @@ class ScenarioManager {
     this.scenarios = {};
     this.currentScenario = null;
     this.currentInteractionIndex = 0;
-    
-    // Initialize the scenarios database
-    this.initializeScenarios();
   }
 
   // Initialize all game scenarios
@@ -80,6 +77,20 @@ class ScenarioManager {
         );
       });
     });
+    
+    // Add additional scenarios
+    this.addAdditionalScenarios();
+  }
+  
+  // Add additional scenarios from our extended content
+  addAdditionalScenarios() {
+    Object.keys(additionalScenarios).forEach(countryId => {
+      const additionalCountry = additionalScenarios[countryId];
+      
+      additionalCountry.scenarios.forEach(scenarioData => {
+        this.addScenario(countryId, scenarioData);
+      });
+    });
   }
 
   // Start a specific scenario
@@ -93,7 +104,9 @@ class ScenarioManager {
     this.currentInteractionIndex = 0;
     
     // Signal to game that scenario is starting
-    this.game.onScenarioStart(this.currentScenario);
+    if (this.game.onScenarioStart) {
+      this.game.onScenarioStart(this.currentScenario);
+    }
     
     return true;
   }
@@ -116,7 +129,9 @@ class ScenarioManager {
     this.currentScenario.recordChoice(currentInteraction.id, option);
     
     // Signal to game that option was selected
-    this.game.onOptionSelected(currentInteraction, option);
+    if (this.game.onOptionSelected) {
+      this.game.onOptionSelected(currentInteraction, option);
+    }
     
     return true;
   }
@@ -130,13 +145,17 @@ class ScenarioManager {
     // Check if we've reached the end of the scenario
     if (this.currentInteractionIndex >= this.currentScenario.interactions.length) {
       const score = this.currentScenario.complete();
-      this.game.onScenarioComplete(this.currentScenario, score);
+      if (this.game.onScenarioComplete) {
+        this.game.onScenarioComplete(this.currentScenario, score);
+      }
       return false;
     }
     
     // Get the next interaction and signal to game
     const nextInteraction = this.getCurrentInteraction();
-    this.game.onInteractionStart(nextInteraction);
+    if (this.game.onInteractionStart) {
+      this.game.onInteractionStart(nextInteraction);
+    }
     
     return true;
   }
@@ -155,7 +174,7 @@ class ScenarioManager {
     // Add to scenarios database
     this.scenarios[scenarioData.id] = newScenario;
     
-    // Add to country's scenarios list
+    // Add to country's scenarios list if the country exists
     if (this.game.countries[countryId]) {
       this.game.countries[countryId].scenarios.push(scenarioData);
     }
