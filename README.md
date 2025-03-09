@@ -59,26 +59,22 @@ npx serve
 
 ```
 global-business-quest/
-│
-├── index.html               # Main HTML file
-├── game.js                  # Main game JavaScript file
-├── styles.css               # CSS styles 
-│
-├── assets/                  # Game assets directory
-│   ├── models/              # 3D models
-│   ├── textures/            # Textures for 3D models
-│   └── sounds/              # Sound effects and music
-│
-├── js/                      # Additional JavaScript modules
-│   ├── countries/           # Country-specific logic
-│   │   ├── japan.js         # Japan scenarios and content
-│   │   └── france.js        # France scenarios and content
-│   │
-│   ├── scenarios.js         # Scenario management
-│   ├── interactions.js      # Player interaction handling
-│   └── ui.js                # UI components and management
-│
-└── README.md                # Project documentation
+├── index.html                                  # Entry point
+├── game.js                                     # Main game file
+├── styles.css                                  # CSS styles
+├── js/                                         # JS modules directory
+│   ├── scenarios.js                            # Scenario management
+│   ├── interactions.js                         # Interaction handling
+│   ├── ui.js                                   # UI components
+│   └── countries/                              # Country environments
+│       ├── TokyoOfficeEnvironment.js           # Japan environment
+│       └── ParisRestaurantEnvironment.js       # France environment
+│       └── textures.js                         # Texture management
+├── assets/                                     # Assets directory
+│   ├── images/                                 # Image files
+│   │   └── countries/                          # Country images
+│   │       ├── japan.jpg
+│   │       └── france.jpg
 ```
 
 ## Customization and Expansion
