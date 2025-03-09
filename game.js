@@ -2,9 +2,10 @@
 // This file sets up the core game environment and mechanics
 
 // Import Three.js and necessary modules from CDN
-import * as THREE from 'https://unpkg.com/three@0.159.0/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.159.0/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.159.0/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.174/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/loaders/GLTFLoader.js';
+
 
 // For local implementation, we'll skip the other imports and include simple implementations
 // Import { InteractionManager, enhancedInteractions } from './interactions.js';
