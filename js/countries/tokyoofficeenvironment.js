@@ -1,677 +1,343 @@
-// Tokyo Office Environment for Global Business Quest
-// Main environment file for the Japanese business meeting scenario
+// Global Business Quest - Tokyo Office Environment
+// This file defines the 3D environment for the Tokyo business meeting scenario
 
 import * as THREE from 'three';
 import { textureManager } from '../utils/textures.js';
 
-export class TokyoOfficeEnvironment {
-  constructor(scene) {
-    // Store scene reference
+// Tokyo Office Environment class
+class TokyoOfficeEnvironment {
+  constructor(scene, loader) {
     this.scene = scene;
+    this.loader = loader;
     
-    // Create a container for all office items
+    // Create groups for organizing scene objects
     this.officeItems = new THREE.Group();
-    this.officeItems.name = "tokyoOffice";
-    this.scene.add(this.officeItems);
+    this.businessItems = new THREE.Group();
     
-    // Interactive objects for raycasting
-    this.interactiveObjects = [];
-    
-    // Setup for business card exchange interaction
-    this.businessCardExchangeSetup = {
-      cardHolder: null,
-      playerCard: null,
-      japaneseCard: null,
-      cardExchangeInProgress: false,
-      cardExchangeComplete: false
-    };
-    
-    // Character positions
-    this.characterPositions = {
-      player: new THREE.Vector3(0, 0, 1.5),
-      executive: new THREE.Vector3(0, 0, -1),
-      assistant1: new THREE.Vector3(-1.5, 0, -1),
-      assistant2: new THREE.Vector3(1.5, 0, -1)
-    };
-    
-    // Create the environment
-    this.createRoom();
-    this.createFurniture();
-    this.createWindows();
-    this.createLighting();
-    this.createDecorations();
-    
-    // Apply textures
-    textureManager.applyTokyoOfficeTextures(this);
-    
-    // Setup interactive elements
-    this.setupInteractiveElements();
+    // Initialize the environment
+    this.init();
   }
   
-  createRoom() {
-    // Floor
-    const floorGeometry = new THREE.PlaneGeometry(10, 8);
-    const floorMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xEFEFEF,
-      roughness: 0.1,
-      metalness: 0
+  // Initialize the environment
+  init() {
+    console.log("Creating Tokyo office environment...");
+    
+    // Add office to the scene
+    this.createOfficeRoom();
+    this.createFurniture();
+    this.createBusinessItems();
+    
+    // Add groups to the scene
+    this.scene.add(this.officeItems);
+    this.scene.add(this.businessItems);
+  }
+  
+  // Create the office room
+  createOfficeRoom() {
+    // Room dimensions
+    const width = 10;
+    const height = 3.5;
+    const depth = 8;
+    
+    // Create a box with BackSide material to create a room
+    const roomGeometry = new THREE.BoxGeometry(width, height, depth);
+    const roomMaterial = new THREE.MeshStandardMaterial({ 
+      color: 0xF0F0F0, 
+      side: THREE.BackSide 
     });
+    
+    const room = new THREE.Mesh(roomGeometry, roomMaterial);
+    room.position.set(0, height/2, 0);
+    room.name = "officeRoom";
+    this.officeItems.add(room);
+    
+    // Add floor with a different material
+    const floorGeometry = new THREE.PlaneGeometry(width, depth);
+    const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x8B8B8B });
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0;
-    floor.receiveShadow = true;
+    floor.position.y = 0.01; // Slightly above the ground to avoid z-fighting
+    floor.name = "officeFloor";
     this.officeItems.add(floor);
     
-    // Ceiling
-    const ceilingGeometry = new THREE.PlaneGeometry(10, 8);
-    const ceilingMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFFF
-    });
+    // Add ceiling
+    const ceilingGeometry = new THREE.PlaneGeometry(width, depth);
+    const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
     const ceiling = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
     ceiling.rotation.x = Math.PI / 2;
-    ceiling.position.y = 3;
+    ceiling.position.y = height - 0.01;
+    ceiling.name = "officeCeiling";
     this.officeItems.add(ceiling);
     
-    // Walls
-    const wallMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xF5F5F5,
-      roughness: 0.2
-    });
-    
-    // Back wall
-    const backWallGeometry = new THREE.PlaneGeometry(10, 3);
-    const backWall = new THREE.Mesh(backWallGeometry, wallMaterial);
-    backWall.position.set(0, 1.5, -4);
-    backWall.receiveShadow = true;
-    this.officeItems.add(backWall);
-    
-    // Front wall with door cutout
-    const frontWallLeft = new THREE.Mesh(
-      new THREE.PlaneGeometry(4, 3),
-      wallMaterial
-    );
-    frontWallLeft.position.set(-3, 1.5, 4);
-    frontWallLeft.rotation.y = Math.PI;
-    this.officeItems.add(frontWallLeft);
-    
-    const frontWallRight = new THREE.Mesh(
-      new THREE.PlaneGeometry(4, 3),
-      wallMaterial
-    );
-    frontWallRight.position.set(3, 1.5, 4);
-    frontWallRight.rotation.y = Math.PI;
-    this.officeItems.add(frontWallRight);
-    
-    // Door frame
-    const doorFrameMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x8B4513
-    });
-    
-    const doorFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(2.2, 2.8, 0.2),
-      doorFrameMaterial
-    );
-    doorFrame.position.set(0, 1.4, 4);
-    this.officeItems.add(doorFrame);
-    
-    // Left wall
-    const leftWallGeometry = new THREE.PlaneGeometry(8, 3);
-    const leftWall = new THREE.Mesh(leftWallGeometry, wallMaterial);
-    leftWall.position.set(-5, 1.5, 0);
-    leftWall.rotation.y = Math.PI / 2;
-    leftWall.receiveShadow = true;
-    this.officeItems.add(leftWall);
-    
-    // Right wall (with windows)
-    const rightWallGeometry = new THREE.PlaneGeometry(8, 3);
-    const rightWall = new THREE.Mesh(rightWallGeometry, wallMaterial);
-    rightWall.position.set(5, 1.5, 0);
-    rightWall.rotation.y = -Math.PI / 2;
-    rightWall.receiveShadow = true;
-    this.officeItems.add(rightWall);
-    
-    // Floor baseboard
-    const baseboardMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x5C5C5C
-    });
-    
-    // Add baseboards to all walls
-    this.createBaseboard(5, 0.1, 0.15, 0, 0.075, -4, 0, baseboardMaterial); // Back
-    this.createBaseboard(5, 0.1, 0.15, -3, 0.075, 4, Math.PI, baseboardMaterial); // Front left
-    this.createBaseboard(5, 0.1, 0.15, 3, 0.075, 4, Math.PI, baseboardMaterial); // Front right
-    this.createBaseboard(8, 0.1, 0.15, -5, 0.075, 0, Math.PI/2, baseboardMaterial); // Left
-    this.createBaseboard(8, 0.1, 0.15, 5, 0.075, 0, -Math.PI/2, baseboardMaterial); // Right
+    // Add window
+    const windowGeometry = new THREE.PlaneGeometry(4, 2);
+    const windowMaterial = textureManager.createOfficeMaterial('window');
+    const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+    window1.position.set(0, 1.5, -depth/2 + 0.01); // Back wall
+    window1.name = "officeWindow";
+    this.officeItems.add(window1);
   }
   
-  createBaseboard(width, height, depth, x, y, z, rotation, material) {
-    const baseboard = new THREE.Mesh(
-      new THREE.BoxGeometry(width, height, depth),
-      material
-    );
-    baseboard.position.set(x, y, z);
-    if (rotation) {
-      baseboard.rotation.y = rotation;
-    }
-    this.officeItems.add(baseboard);
-  }
-  
-  createWindows() {
-    // Window frames
-    const windowFrameMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x696969
-    });
-    
-    // Window glass
-    const windowGlassMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xADD8E6,
-      transparent: true,
-      opacity: 0.3
-    });
-    
-    // Create three windows on the right wall
-    for (let i = -2.5; i <= 2.5; i += 2.5) {
-      // Window frame
-      const windowFrame = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, 1.8, 1.4),
-        windowFrameMaterial
-      );
-      windowFrame.position.set(4.95, 1.7, i);
-      this.officeItems.add(windowFrame);
-      
-      // Window glass
-      const windowGlass = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.2, 1.6),
-        windowGlassMaterial
-      );
-      windowGlass.position.set(4.9, 1.7, i);
-      windowGlass.rotation.y = -Math.PI / 2;
-      this.officeItems.add(windowGlass);
-      
-      // Window dividers
-      const horizontalDivider = new THREE.Mesh(
-        new THREE.BoxGeometry(0.05, 0.05, 1.2),
-        windowFrameMaterial
-      );
-      horizontalDivider.position.set(4.9, 1.7, i);
-      this.officeItems.add(horizontalDivider);
-      
-      const verticalDivider = new THREE.Mesh(
-        new THREE.BoxGeometry(0.05, 1.6, 0.05),
-        windowFrameMaterial
-      );
-      verticalDivider.position.set(4.9, 1.7, i);
-      this.officeItems.add(verticalDivider);
-    }
-  }
-  
+  // Create office furniture
   createFurniture() {
-    // Large conference table
-    const tableGeometry = new THREE.BoxGeometry(4, 0.1, 2);
-    const tableMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x5C3A21,
-      roughness: 0.3
-    });
-    const table = new THREE.Mesh(tableGeometry, tableMaterial);
-    table.position.set(0, 0.75, 0);
-    table.castShadow = true;
-    table.receiveShadow = true;
-    table.name = "conferenceTable";
-    this.officeItems.add(table);
+    // Conference table
+    this.createConferenceTable(0, 0.75, 0);
+    
+    // Chairs around the table
+    this.createChairs();
+    
+    // Add a plant in the corner
+    this.createPlant(-4, 0, -3);
+    
+    // Add a whiteboard on the wall
+    this.createWhiteboard(4, 1.75, -3.9);
+  }
+  
+  // Create conference table
+  createConferenceTable(x, y, z) {
+    // Table top
+    const tableTopGeometry = new THREE.BoxGeometry(5, 0.1, 2.5);
+    const tableTopMaterial = textureManager.createOfficeMaterial('desk');
+    const tableTop = new THREE.Mesh(tableTopGeometry, tableTopMaterial);
+    tableTop.position.set(x, y, z);
+    tableTop.receiveShadow = true;
+    tableTop.name = "conferenceTable";
+    this.officeItems.add(tableTop);
     
     // Table legs
-    const legGeometry = new THREE.BoxGeometry(0.1, 0.75, 0.1);
-    const legMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x3A2213
-    });
+    const legGeometry = new THREE.BoxGeometry(0.1, y, 0.1);
+    const legMaterial = textureManager.createOfficeMaterial('desk');
     
+    // Positions for the four legs
     const legPositions = [
-      [-1.9, 0.375, -0.9],
-      [1.9, 0.375, -0.9],
-      [-1.9, 0.375, 0.9],
-      [1.9, 0.375, 0.9]
+      [x - 2.4, y/2, z - 1.2],
+      [x + 2.4, y/2, z - 1.2],
+      [x - 2.4, y/2, z + 1.2],
+      [x + 2.4, y/2, z + 1.2]
     ];
     
-    legPositions.forEach(pos => {
+    legPositions.forEach((pos, index) => {
       const leg = new THREE.Mesh(legGeometry, legMaterial);
       leg.position.set(...pos);
       leg.castShadow = true;
+      leg.name = `tableleg_${index}`;
       this.officeItems.add(leg);
     });
-    
-    // Chairs
-    this.createChair(0, 0, 1.5, 0); // Your chair (facing away from the player)
-    this.createChair(-1.5, 0, -1, Math.PI); // Chair opposite left
-    this.createChair(0, 0, -1, Math.PI); // Chair opposite center
-    this.createChair(1.5, 0, -1, Math.PI); // Chair opposite right
-    
-    // Credenza against back wall
-    const credenzaGeometry = new THREE.BoxGeometry(3, 0.9, 0.6);
-    const credenzaMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x5C3A21,
-      roughness: 0.3
-    });
-    const credenza = new THREE.Mesh(credenzaGeometry, credenzaMaterial);
-    credenza.position.set(0, 0.45, -3.7);
-    credenza.castShadow = true;
-    this.officeItems.add(credenza);
-    
-    // Create drawers on credenza
-    const drawerMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x4A2E1A
-    });
-    for (let i = -1.25; i <= 1.25; i += 0.5) {
-      const drawer = new THREE.Mesh(
-        new THREE.BoxGeometry(0.45, 0.25, 0.05),
-        drawerMaterial
-      );
-      drawer.position.set(i, 0.45, -3.37);
-      this.officeItems.add(drawer);
-      
-      // Drawer handle
-      const handle = new THREE.Mesh(
-        new THREE.BoxGeometry(0.1, 0.02, 0.04),
-        new THREE.MeshStandardMaterial({ color: 0xC0C0C0 })
-      );
-      handle.position.set(i, 0.45, -3.34);
-      this.officeItems.add(handle);
-    }
-    
-    // Whiteboard on the left wall
-    const whiteboardGeometry = new THREE.BoxGeometry(2, 1.5, 0.05);
-    const whiteboardMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFFF,
-      roughness: 0.1
-    });
-    const whiteboard = new THREE.Mesh(whiteboardGeometry, whiteboardMaterial);
-    whiteboard.position.set(-4.97, 1.7, -2);
-    whiteboard.rotation.y = Math.PI / 2;
-    whiteboard.name = "whiteboard";
-    this.officeItems.add(whiteboard);
-    
-    // Whiteboard frame
-    const frameGeometry = new THREE.BoxGeometry(2.1, 1.6, 0.07);
-    const frameMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x696969
-    });
-    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.set(-4.96, 1.7, -2);
-    frame.rotation.y = Math.PI / 2;
-    this.officeItems.add(frame);
-    
-    // Whiteboard tray for markers
-    const trayGeometry = new THREE.BoxGeometry(2, 0.1, 0.15);
-    const trayMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xA9A9A9
-    });
-    const tray = new THREE.Mesh(trayGeometry, trayMaterial);
-    tray.position.set(-4.9, 0.95, -2);
-    tray.rotation.y = Math.PI / 2;
-    this.officeItems.add(tray);
   }
   
-  createChair(x, y, z, rotation) {
-    const chairGroup = new THREE.Group();
-    chairGroup.name = "chair";
+  // Create chairs around the table
+  createChairs() {
+    // Chair positions around the table
+    const chairPositions = [
+      [-2, 0.5, 1.5],  // Chair 1 - Japanese executive
+      [0, 0.5, 1.5],   // Chair 2 - Japanese manager
+      [2, 0.5, 1.5],   // Chair 3 - Japanese team member
+      [-2, 0.5, -1.5], // Chair 4 - Player
+      [0, 0.5, -1.5],  // Chair 5 - Player colleague 1
+      [2, 0.5, -1.5]   // Chair 6 - Player colleague 2
+    ];
+    
+    chairPositions.forEach((pos, index) => {
+      this.createChair(...pos, index);
+    });
+  }
+  
+  // Create a chair
+  createChair(x, y, z, index) {
+    // Chair materials
+    const chairMaterial = textureManager.createOfficeMaterial('chair');
     
     // Seat
-    const seatGeometry = new THREE.BoxGeometry(0.6, 0.1, 0.6);
-    const seatMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x000000
-    });
-    const seat = new THREE.Mesh(seatGeometry, seatMaterial);
-    seat.position.set(0, 0.4, 0);
+    const seatGeometry = new THREE.BoxGeometry(0.8, 0.1, 0.8);
+    const seat = new THREE.Mesh(seatGeometry, chairMaterial);
+    seat.position.set(x, y, z);
     seat.castShadow = true;
-    chairGroup.add(seat);
     
     // Backrest
-    const backrestGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.1);
-    const backrest = new THREE.Mesh(backrestGeometry, seatMaterial);
-    backrest.position.set(0, 0.7, -0.25);
+    const backrestGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.1);
+    const backrest = new THREE.Mesh(backrestGeometry, chairMaterial);
+    
+    // Position the backrest based on which side of the table the chair is on
+    if (z > 0) {
+      // Chairs on the far side of the table (Japanese side)
+      backrest.position.set(x, y + 0.45, z + 0.45);
+    } else {
+      // Chairs on the near side of the table (Player side)
+      backrest.position.set(x, y + 0.45, z - 0.45);
+    }
+    
     backrest.castShadow = true;
-    chairGroup.add(backrest);
     
-    // Chair legs (simplified as a central column)
-    const legGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.4, 8);
-    const legMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x696969
-    });
-    const leg = new THREE.Mesh(legGeometry, legMaterial);
-    leg.position.set(0, 0.2, 0);
-    leg.castShadow = true;
-    chairGroup.add(leg);
+    // Create a group for the chair
+    const chair = new THREE.Group();
+    chair.add(seat);
+    chair.add(backrest);
+    chair.name = `chair_${index}`;
     
-    // Chair base
-    const baseGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.05, 16);
-    const baseMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x696969
-    });
-    const base = new THREE.Mesh(baseGeometry, baseMaterial);
-    base.position.set(0, 0.025, 0);
-    base.castShadow = true;
-    chairGroup.add(base);
-    
-    // Set chair position and rotation
-    chairGroup.position.set(x, y, z);
-    if (rotation) {
-      chairGroup.rotation.y = rotation;
-    }
-    
-    this.officeItems.add(chairGroup);
-    return chairGroup;
+    this.officeItems.add(chair);
   }
   
-  createLighting() {
-    // Ceiling lights
-    const lightGeometry = new THREE.BoxGeometry(3, 0.1, 0.6);
-    const lightMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0xFFFFFF
-    });
-    
-    for (let z = -2; z <= 2; z += 2) {
-      const light = new THREE.Mesh(lightGeometry, lightMaterial);
-      light.position.set(0, 2.95, z);
-      this.officeItems.add(light);
-      
-      // Add actual light source
-      const ceilingLight = new THREE.PointLight(0xFFFFFF, 0.8, 6);
-      ceilingLight.position.set(0, 2.8, z);
-      this.officeItems.add(ceilingLight);
-    }
-    
-    // Ambient light for overall scene visibility
-    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.3);
-    this.officeItems.add(ambientLight);
-    
-    // Directional light for shadows (simulating sun through windows)
-    const dirLight = new THREE.DirectionalLight(0xFFFFFF, 0.5);
-    dirLight.position.set(10, 10, 5);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
-    this.officeItems.add(dirLight);
-  }
-  
-  createDecorations() {
-    // Plant in the corner
-    this.createPlant(-4, 0, -3.5);
-    
-    // Documents on the table
-    this.createDocuments(0.5, 0.76, 0.3);
-    this.createDocuments(-0.7, 0.76, -0.2);
-    
-    // Japanese scroll painting on back wall
-    this.createScrollPainting(2, 1.8, -3.95);
-    
-    // Japanese calligraphy on the right wall
-    this.createCalligraphy(4.95, 1.8, 0);
-    
-    // Business card holder on table
-    this.createBusinessCardHolder(0, 0.76, 0);
-  }
-  
+  // Create a plant
   createPlant(x, y, z) {
-    // Pot
-    const potGeometry = new THREE.CylinderGeometry(0.3, 0.2, 0.4, 16);
-    const potMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x8B4513
-    });
+    // Plant pot
+    const potGeometry = new THREE.CylinderGeometry(0.3, 0.4, 0.6, 16);
+    const potMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
     const pot = new THREE.Mesh(potGeometry, potMaterial);
-    pot.position.set(x, y + 0.2, z);
+    pot.position.set(x, y + 0.3, z);
     pot.castShadow = true;
-    this.officeItems.add(pot);
+    pot.receiveShadow = true;
     
-    // Plant stems and leaves (simplified)
-    const stemsGeometry = new THREE.ConeGeometry(0.4, 1.2, 6);
-    const stemsMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x228B22
-    });
-    const stems = new THREE.Mesh(stemsGeometry, stemsMaterial);
-    stems.position.set(x, y + 1, z);
-    stems.castShadow = true;
-    this.officeItems.add(stems);
+    // Plant leaves (simplified as a cone)
+    const leavesGeometry = new THREE.ConeGeometry(0.5, 1.2, 8);
+    const leavesMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+    const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+    leaves.position.set(x, y + 1.2, z);
+    leaves.castShadow = true;
+    
+    // Create a group for the plant
+    const plant = new THREE.Group();
+    plant.add(pot);
+    plant.add(leaves);
+    plant.name = "officePlant";
+    
+    this.officeItems.add(plant);
   }
   
-  createDocuments(x, y, z) {
-    // Stack of papers
-    const paperGeometry = new THREE.BoxGeometry(0.3, 0.02, 0.4);
-    const paperMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFFF
-    });
-    const papers = new THREE.Mesh(paperGeometry, paperMaterial);
-    papers.position.set(x, y, z);
-    papers.castShadow = true;
-    papers.name = "documents";
-    this.officeItems.add(papers);
+  // Create a whiteboard
+  createWhiteboard(x, y, z) {
+    // Whiteboard
+    const boardGeometry = new THREE.BoxGeometry(2.5, 1.5, 0.05);
+    const boardMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+    const board = new THREE.Mesh(boardGeometry, boardMaterial);
+    board.position.set(x, y, z);
+    board.receiveShadow = true;
     
-    // Add some subtle texture/lines to the papers
-    const lineGeometry = new THREE.BoxGeometry(0.25, 0.021, 0.01);
-    const lineMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x000000
-    });
-    
-    for (let i = -0.15; i < 0.15; i += 0.05) {
-      const line = new THREE.Mesh(lineGeometry, lineMaterial);
-      line.position.set(x, y + 0.01, z + i);
-      this.officeItems.add(line);
-    }
-  }
-  
-  createScrollPainting(x, y, z) {
-    // Scroll
-    const scrollGeometry = new THREE.PlaneGeometry(1, 1.5);
-    
-    // This would normally load an actual texture
-    // For now we'll use a colored material to represent the scroll
-    const scrollMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xF5F5DC,
-      roughness: 0.5
-    });
-    
-    const scroll = new THREE.Mesh(scrollGeometry, scrollMaterial);
-    scroll.position.set(x, y, z);
-    scroll.castShadow = true;
-    scroll.name = "scroll";
-    this.officeItems.add(scroll);
-    
-    // Simple patterns on the scroll (simplified art)
-    const artGeometry = new THREE.PlaneGeometry(0.8, 0.6);
-    const artMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x4682B4,
-      transparent: true,
-      opacity: 0.7
-    });
-    
-    const art = new THREE.Mesh(artGeometry, artMaterial);
-    art.position.set(x, y, z + 0.01);
-    this.officeItems.add(art);
-  }
-  
-  createCalligraphy(x, y, z) {
-    // Calligraphy frame
-    const frameGeometry = new THREE.BoxGeometry(0.05, 1.2, 0.6);
-    const frameMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x8B4513
-    });
+    // Frame
+    const frameGeometry = new THREE.BoxGeometry(2.6, 1.6, 0.07);
+    const frameMaterial = new THREE.MeshStandardMaterial({ color: 0x696969 });
     const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.set(x, y, z);
-    frame.rotation.y = Math.PI / 2;
-    this.officeItems.add(frame);
+    frame.position.set(x, y, z - 0.01);
     
-    // Calligraphy paper
-    const paperGeometry = new THREE.PlaneGeometry(0.5, 1);
-    const paperMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFF0
-    });
-    const paper = new THREE.Mesh(paperGeometry, paperMaterial);
-    paper.position.set(x - 0.03, y, z);
-    paper.rotation.y = Math.PI / 2;
-    paper.name = "calligraphy";
-    this.officeItems.add(paper);
+    // Create a group for the whiteboard
+    const whiteboard = new THREE.Group();
+    whiteboard.add(frame);
+    whiteboard.add(board);
+    whiteboard.name = "whiteboard";
     
-    // Japanese character (simplified)
-    const charGeometry = new THREE.PlaneGeometry(0.3, 0.6);
-    const charMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x000000
-    });
-    const char = new THREE.Mesh(charGeometry, charMaterial);
-    char.position.set(x - 0.04, y, z);
-    char.rotation.y = Math.PI / 2;
-    this.officeItems.add(char);
+    this.officeItems.add(whiteboard);
   }
   
+  // Create business items specific to Japanese business culture
+  createBusinessItems() {
+    // Business card holder
+    this.createBusinessCardHolder(0, 0.81, 0);
+    
+    // Tea set
+    this.createTeaSet(1.5, 0.81, 0.5);
+    
+    // Documents and folders
+    this.createDocuments(-1.5, 0.81, 0);
+  }
+  
+  // Create business card holder
   createBusinessCardHolder(x, y, z) {
-    // Card holder base
-    const holderGeometry = new THREE.BoxGeometry(0.2, 0.05, 0.15);
-    const holderMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x8B4513,
-      roughness: 0.2
-    });
+    // Card holder
+    const holderGeometry = new THREE.BoxGeometry(0.12, 0.03, 0.08);
+    const holderMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
     const holder = new THREE.Mesh(holderGeometry, holderMaterial);
-    holder.position.set(x, y + 0.025, z);
-    holder.castShadow = true;
-    holder.name = "businessCardHolder";
-    this.officeItems.add(holder);
+    holder.position.set(x, y, z);
+    holder.receiveShadow = true;
     
-    // Store reference for interaction
-    this.businessCardExchangeSetup.cardHolder = holder;
-    
-    // Business cards
-    const cardGeometry = new THREE.BoxGeometry(0.15, 0.01, 0.1);
-    const cardMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFFF
-    });
+    // Business cards (white rectangles)
+    const cardGeometry = new THREE.BoxGeometry(0.09, 0.01, 0.05);
+    const cardMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
     const cards = new THREE.Mesh(cardGeometry, cardMaterial);
-    cards.position.set(x, y + 0.06, z);
-    cards.castShadow = true;
-    cards.name = "businessCards";
-    this.officeItems.add(cards);
+    cards.position.set(x, y + 0.02, z);
     
-    // Make this interactive
-    this.interactiveObjects.push(holder);
-    this.interactiveObjects.push(cards);
+    // Create a group for the business card holder
+    const businessCardHolder = new THREE.Group();
+    businessCardHolder.add(holder);
+    businessCardHolder.add(cards);
+    businessCardHolder.name = "businessCardHolder";
+    
+    this.businessItems.add(businessCardHolder);
   }
   
-  setupInteractiveElements() {
-    // Make conference table interactive for seating arrangement scenario
-    const conferenceTable = this.officeItems.getObjectByName("conferenceTable");
-    if (conferenceTable) {
-      conferenceTable.userData.isInteractive = true;
-      conferenceTable.userData.interactionType = "seating";
-      this.interactiveObjects.push(conferenceTable);
-    }
+  // Create tea set
+  createTeaSet(x, y, z) {
+    // Tray
+    const trayGeometry = new THREE.BoxGeometry(0.8, 0.03, 0.5);
+    const trayMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+    const tray = new THREE.Mesh(trayGeometry, trayMaterial);
+    tray.position.set(x, y, z);
+    tray.receiveShadow = true;
     
-    // Make business card holder interactive
-    const cardHolder = this.officeItems.getObjectByName("businessCardHolder");
-    if (cardHolder) {
-      cardHolder.userData.isInteractive = true;
-      cardHolder.userData.interactionType = "businessCards";
-    }
+    // Teapot
+    const potGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+    const potMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
+    const pot = new THREE.Mesh(potGeometry, potMaterial);
+    pot.position.set(x - 0.2, y + 0.1, z);
+    pot.scale.set(1, 0.8, 1);
+    pot.castShadow = true;
     
-    // Make whiteboard interactive for presentation scenario
-    const whiteboard = this.officeItems.getObjectByName("whiteboard");
-    if (whiteboard) {
-      whiteboard.userData.isInteractive = true;
-      whiteboard.userData.interactionType = "presentation";
-      this.interactiveObjects.push(whiteboard);
-    }
-  }
-  
-  // Method to position characters in the scene
-  positionCharacters(characters) {
-    if (!characters || characters.length === 0) return;
+    // Teacups
+    const cupPositions = [
+      [x + 0.1, y + 0.05, z - 0.1],
+      [x + 0.1, y + 0.05, z + 0.1],
+      [x + 0.3, y + 0.05, z - 0.1],
+      [x + 0.3, y + 0.05, z + 0.1]
+    ];
     
-    characters.forEach(character => {
-      if (character.id === 'player') {
-        character.model.position.copy(this.characterPositions.player);
-        character.model.rotation.y = Math.PI;
-      } else if (character.id === 'executive') {
-        character.model.position.copy(this.characterPositions.executive);
-      } else if (character.id === 'assistant1') {
-        character.model.position.copy(this.characterPositions.assistant1);
-      } else if (character.id === 'assistant2') {
-        character.model.position.copy(this.characterPositions.assistant2);
-      }
+    const cups = new THREE.Group();
+    
+    cupPositions.forEach((pos, index) => {
+      const cupGeometry = new THREE.CylinderGeometry(0.04, 0.03, 0.05, 16);
+      const cupMaterial = new THREE.MeshStandardMaterial({ color: 0xF5F5F5 });
+      const cup = new THREE.Mesh(cupGeometry, cupMaterial);
+      cup.position.set(...pos);
+      cup.castShadow = true;
+      cup.name = `teacup_${index}`;
+      cups.add(cup);
     });
+    
+    // Create a group for the tea set
+    const teaSet = new THREE.Group();
+    teaSet.add(tray);
+    teaSet.add(pot);
+    teaSet.add(cups);
+    teaSet.name = "teaSet";
+    
+    this.businessItems.add(teaSet);
   }
   
-  // Business card exchange interaction
-  initiateBusinessCardExchange() {
-    if (this.businessCardExchangeSetup.cardExchangeInProgress) return;
+  // Create documents and folders
+  createDocuments(x, y, z) {
+    // Folder
+    const folderGeometry = new THREE.BoxGeometry(0.4, 0.03, 0.3);
+    const folderMaterial = new THREE.MeshStandardMaterial({ color: 0x2E4372 });
+    const folder = new THREE.Mesh(folderGeometry, folderMaterial);
+    folder.position.set(x, y, z);
+    folder.receiveShadow = true;
     
-    this.businessCardExchangeSetup.cardExchangeInProgress = true;
+    // Papers (slightly smaller white rectangles)
+    const paperGeometry = new THREE.BoxGeometry(0.38, 0.02, 0.28);
+    const paperMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+    const papers = new THREE.Mesh(paperGeometry, paperMaterial);
+    papers.position.set(x, y + 0.025, z);
     
-    // Create player's business card
-    const playerCardGeometry = new THREE.BoxGeometry(0.1, 0.005, 0.06);
-    const playerCardMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFFFF
-    });
-    const playerCard = new THREE.Mesh(playerCardGeometry, playerCardMaterial);
-    playerCard.position.set(0, 0.85, 0.3);
-    playerCard.rotation.x = Math.PI / 6; // Slight tilt
-    playerCard.name = "playerBusinessCard";
-    this.officeItems.add(playerCard);
+    // Create a group for the documents
+    const documents = new THREE.Group();
+    documents.add(folder);
+    documents.add(papers);
+    documents.name = "documents";
     
-    this.businessCardExchangeSetup.playerCard = playerCard;
-    
-    // Create Japanese business card
-    const japaneseCardGeometry = new THREE.BoxGeometry(0.1, 0.005, 0.06);
-    const japaneseCardMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xFFFAF0
-    });
-    const japaneseCard = new THREE.Mesh(japaneseCardGeometry, japaneseCardMaterial);
-    japaneseCard.position.set(0, 0.85, -0.3);
-    japaneseCard.rotation.x = -Math.PI / 6; // Slight tilt opposite direction
-    japaneseCard.name = "japaneseBusinessCard";
-    this.officeItems.add(japaneseCard);
-    
-    this.businessCardExchangeSetup.japaneseCard = japaneseCard;
-    
-    return {
-      playerCard: playerCard,
-      japaneseCard: japaneseCard
-    };
+    this.businessItems.add(documents);
   }
   
-  // Complete the business card exchange
-  completeBusinessCardExchange() {
-    if (!this.businessCardExchangeSetup.cardExchangeInProgress) return;
-    
-    // Move cards to the table
-    if (this.businessCardExchangeSetup.playerCard) {
-      this.businessCardExchangeSetup.playerCard.position.set(-0.1, 0.755, -0.15);
-      this.businessCardExchangeSetup.playerCard.rotation.set(-Math.PI/2, 0, 0);
-    }
-    
-    if (this.businessCardExchangeSetup.japaneseCard) {
-      this.businessCardExchangeSetup.japaneseCard.position.set(0.1, 0.755, 0.15);
-      this.businessCardExchangeSetup.japaneseCard.rotation.set(-Math.PI/2, 0, 0);
-    }
-    
-    this.businessCardExchangeSetup.cardExchangeInProgress = false;
-    this.businessCardExchangeSetup.cardExchangeComplete = true;
+  // Update method called on each frame
+  update(time) {
+    // Animate subtle movements or effects here if needed
   }
-  
-  // Animate elements in the environment (subtle movements)
-  animate(time) {
-    // Subtle light flicker for realism
-    if (this.officeItems.children) {
-      this.officeItems.children.forEach(child => {
-        if (child instanceof THREE.PointLight) {
-          child.intensity = 0.8 + Math.sin(time * 0.005) * 0.05;
-        }
-      });
-    }
-    
-    // If business card exchange is in progress, animate the cards
-    if (this.businessCardExchangeSetup.cardExchangeInProgress) {
-      if (this.businessCardExchangeSetup.playerCard) {
-        const playerCard = this.businessCardExchangeSetup.playerCard;
-        playerCard.position.y = 0.85 + Math.sin(time * 0.002) * 0.01;
-      }
-      
-      if (this.businessCardExchangeSetup.japaneseCard) {
-        const japaneseCard = this.businessCardExchangeSetup.japaneseCard;
-        japaneseCard.position.y = 0.85 + Math.sin(time * 0.002 + Math.PI) * 0.01;
-      }
-    }
-  }
+}
+
+export { TokyoOfficeEnvironment };
