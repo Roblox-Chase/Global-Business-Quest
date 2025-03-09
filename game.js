@@ -5,8 +5,6 @@
 import * as THREE from 'https://unpkg.com/three@0.174.0/build/three.module.js';
 import { OrbitControls } from 'https://unpkg.com/three@0.174.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.174.0/examples/jsm/loaders/GLTFLoader.js';
-
-
 import { InteractionManager, enhancedInteractions } from './interactions.js';
 import { ScenarioManager, additionalScenarios } from './scenarios.js';
 import { UIManager } from './ui.js';
