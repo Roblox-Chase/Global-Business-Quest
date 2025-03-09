@@ -69,15 +69,20 @@
     </div>
   </div>
   
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.157.0/three.module.js",
-    "three/examples/jsm/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/controls/OrbitControls.js",
-    "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/loaders/GLTFLoader.js"
-  }
-}
-</script>
+<!-- Import map for modern browsers -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <!-- Load the main game script as a module -->
+    <script type="module" src="js/game.js"></script>
+</body>
+</html>
 
 <!-- Main application script -->
 <script type="module" src="game.js"></script>
