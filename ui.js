@@ -11,6 +11,12 @@ export class UIManager {
         this.feedbackUI = document.getElementById('feedback-ui');
         this.scoreDisplay = document.getElementById('score-display');
         
+        // Country images
+        this.countryImages = {
+            japan: 'assets/images/countries/japan.jpg',
+            france: 'assets/images/countries/france.jpg'
+        };
+        
         // Initialize event listeners
         this.initEventListeners();
     }
@@ -48,10 +54,45 @@ export class UIManager {
             const countryButton = document.createElement('div');
             countryButton.classList.add('country-button');
             
-            countryButton.innerHTML = `
+            // Create container for better layout
+            const buttonContent = document.createElement('div');
+            buttonContent.className = 'country-button-content';
+            
+            // Add country image
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'country-image';
+            
+            const countryImage = document.createElement('img');
+            countryImage.src = this.countryImages[countryId];
+            countryImage.alt = country.name;
+            countryImage.onerror = function() {
+                // If image fails to load, show fallback
+                this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150"><rect fill="%23CCCCCC" width="200" height="150"/><text fill="%23888888" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" x="100" y="75">' + country.name + '</text></svg>';
+                console.warn(`Image for ${countryId} could not be loaded`);
+            };
+            
+            imageContainer.appendChild(countryImage);
+            buttonContent.appendChild(imageContainer);
+            
+            // Add country info
+            const countryInfo = document.createElement('div');
+            countryInfo.className = 'country-info';
+            
+            countryInfo.innerHTML = `
                 <h3>${country.name}</h3>
                 <p>${country.description}</p>
             `;
+            
+            buttonContent.appendChild(countryInfo);
+            countryButton.appendChild(buttonContent);
+            
+            // Add cultural competence level if player has a score
+            if (this.game.playerScore > 0) {
+                const competenceBadge = document.createElement('div');
+                competenceBadge.className = 'competence-badge';
+                competenceBadge.textContent = `Score: ${this.game.playerScore}`;
+                countryButton.appendChild(competenceBadge);
+            }
             
             countryButton.addEventListener('click', () => {
                 this.game.selectCountry(countryId);
