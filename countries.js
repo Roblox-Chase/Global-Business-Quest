@@ -1,6 +1,8 @@
 // Global Business Quest - Countries Data
 // This module contains the country data and scenarios
 
+import * as THREE from 'three';
+
 export const countries = {
     japan: {
         name: 'Japan',
@@ -97,78 +99,72 @@ export function createCountryEnvironment(scene, countryId) {
 
 // Create Japan office environment
 function createJapanEnvironment(scene) {
-    // Import Three.js dynamically within the function
-    return import('three').then(THREE => {
-        // Create a simple representation of a Japanese office
-        // Table
-        const tableGeometry = new THREE.BoxGeometry(3, 0.2, 1.5);
-        const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-        const table = new THREE.Mesh(tableGeometry, tableMaterial);
-        table.position.y = 0.5;
-        scene.add(table);
-        
-        // Create some simple chairs
-        for (let i = -1; i <= 1; i++) {
-            const chairGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-            const chairMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
-            const chair = new THREE.Mesh(chairGeometry, chairMaterial);
-            chair.position.set(i, 0.25, 1);
-            scene.add(chair);
+    // Create a simple representation of a Japanese office
+    // Table
+    const tableGeometry = new THREE.BoxGeometry(3, 0.2, 1.5);
+    const tableMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+    const table = new THREE.Mesh(tableGeometry, tableMaterial);
+    table.position.y = 0.5;
+    scene.add(table);
+    
+    // Create some simple chairs
+    for (let i = -1; i <= 1; i++) {
+        const chairGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const chairMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const chair = new THREE.Mesh(chairGeometry, chairMaterial);
+        chair.position.set(i, 0.25, 1);
+        scene.add(chair);
+    }
+    
+    // Add a simple whiteboard
+    const boardGeometry = new THREE.PlaneGeometry(2, 1);
+    const boardMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    const board = new THREE.Mesh(boardGeometry, boardMaterial);
+    board.position.set(0, 1.5, -2);
+    scene.add(board);
+    
+    return {
+        animate: (time) => {
+            // Simple animation if needed
         }
-        
-        // Add a simple whiteboard
-        const boardGeometry = new THREE.PlaneGeometry(2, 1);
-        const boardMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-        const board = new THREE.Mesh(boardGeometry, boardMaterial);
-        board.position.set(0, 1.5, -2);
-        scene.add(board);
-        
-        return {
-            animate: (time) => {
-                // Simple animation if needed
-            }
-        };
-    });
+    };
 }
 
 // Create France restaurant environment
 function createFranceEnvironment(scene) {
-    // Import Three.js dynamically within the function
-    return import('three').then(THREE => {
-        // Create a simple representation of a French restaurant
-        // Round table
-        const tableGeometry = new THREE.CylinderGeometry(1, 1, 0.1, 32);
-        const tableMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
-        const table = new THREE.Mesh(tableGeometry, tableMaterial);
-        table.position.y = 0.5;
-        scene.add(table);
-        
-        // Wine glasses
-        for (let i = -0.5; i <= 0.5; i += 0.5) {
-            const glassGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
-            const glassMaterial = new THREE.MeshStandardMaterial({ 
-                color: 0xF5F5F5,
-                transparent: true,
-                opacity: 0.5
-            });
-            const glass = new THREE.Mesh(glassGeometry, glassMaterial);
-            glass.position.set(i, 0.65, i);
-            scene.add(glass);
+    // Create a simple representation of a French restaurant
+    // Round table
+    const tableGeometry = new THREE.CylinderGeometry(1, 1, 0.1, 32);
+    const tableMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+    const table = new THREE.Mesh(tableGeometry, tableMaterial);
+    table.position.y = 0.5;
+    scene.add(table);
+    
+    // Wine glasses
+    for (let i = -0.5; i <= 0.5; i += 0.5) {
+        const glassGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
+        const glassMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xF5F5F5,
+            transparent: true,
+            opacity: 0.5
+        });
+        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+        glass.position.set(i, 0.65, i);
+        scene.add(glass);
+    }
+    
+    // Add plates
+    for (let i = -0.5; i <= 0.5; i += 0.5) {
+        const plateGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.05, 32);
+        const plateMaterial = new THREE.MeshBasicMaterial({ color: 0xF0F0F0 });
+        const plate = new THREE.Mesh(plateGeometry, plateMaterial);
+        plate.position.set(i, 0.6, -i);
+        scene.add(plate);
+    }
+    
+    return {
+        animate: (time) => {
+            // Simple animation if needed
         }
-        
-        // Add plates
-        for (let i = -0.5; i <= 0.5; i += 0.5) {
-            const plateGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.05, 32);
-            const plateMaterial = new THREE.MeshBasicMaterial({ color: 0xF0F0F0 });
-            const plate = new THREE.Mesh(plateGeometry, plateMaterial);
-            plate.position.set(i, 0.6, -i);
-            scene.add(plate);
-        }
-        
-        return {
-            animate: (time) => {
-                // Simple animation if needed
-            }
-        };
-    });
+    };
 }
