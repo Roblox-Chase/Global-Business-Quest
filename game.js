@@ -1,19 +1,25 @@
 // Global Business Quest - Three.js Implementation
 // This file sets up the core game environment and mechanics
 
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.174/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/loaders/GLTFLoader.js';
-import { InteractionManager, enhancedInteractions } from './js/interactions.js';
-import { ScenarioManager, additionalScenarios } from './js/scenarios.js';
-import { UIManager } from './js/ui.js';
-import { TokyoOfficeEnvironment } from './js/countries/TokyoOfficeEnvironment.js';
-import { ParisRestaurantEnvironment } from './js/countries/ParisRestaurantEnvironment.js';
-import { textureManager } from './utils/textures.js';
+// Import Three.js and necessary modules from CDN
+import * as THREE from 'https://unpkg.com/three@0.159.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.159.0/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.159.0/examples/jsm/loaders/GLTFLoader.js';
+
+// For local implementation, we'll skip the other imports and include simple implementations
+// Import { InteractionManager, enhancedInteractions } from './interactions.js';
+// Import { ScenarioManager, additionalScenarios } from './scenarios.js';
+// Import { UIManager } from './ui.js';
+// Import { TokyoOfficeEnvironment } from './countries/TokyoOfficeEnvironment.js';
+// Import { ParisRestaurantEnvironment } from './countries/ParisRestaurantEnvironment.js';
+// Import { textureManager } from './utils/textures.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
   constructor() {
+    console.log("Starting GlobalBusinessQuest...");
+    console.log("THREE.js version:", THREE.REVISION);
+    
     // Game state
     this.currentCountry = null;
     this.currentScenario = null;
@@ -140,14 +146,13 @@ class GlobalBusinessQuest {
     // Three.js setup
     this.initThreeJS();
     
-    // UI setup
-    this.initUI();
-    
     // Start the game
     this.showCountrySelection();
   }
   
   initThreeJS() {
+    console.log("Initializing Three.js...");
+    
     // Scene setup
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x87CEEB); // Sky blue background
@@ -160,7 +165,10 @@ class GlobalBusinessQuest {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.shadowMap.enabled = true;
-    document.body.appendChild(this.renderer.domElement);
+    
+    // Get the container and add the renderer
+    const container = document.getElementById('game-container');
+    container.appendChild(this.renderer.domElement);
     
     // Controls setup
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -182,6 +190,8 @@ class GlobalBusinessQuest {
     
     // Animation loop
     this.animate();
+    
+    console.log("Three.js initialization complete!");
   }
   
   addLights() {
@@ -220,6 +230,8 @@ class GlobalBusinessQuest {
   }
   
   loadJapanScene() {
+    console.log("Loading Japan scene...");
+    
     // Example: Load Tokyo office environment
     
     // Create office building exterior
@@ -249,6 +261,8 @@ class GlobalBusinessQuest {
   }
   
   loadFranceScene() {
+    console.log("Loading France scene...");
+    
     // Example: Load Paris restaurant environment
     
     // Create restaurant exterior
@@ -394,93 +408,24 @@ class GlobalBusinessQuest {
     this.renderer.render(this.scene, this.camera);
   }
   
-  initUI() {
-    // Create UI containers
-    this.uiContainer = document.createElement('div');
-    this.uiContainer.id = 'ui-container';
-    this.uiContainer.style.position = 'absolute';
-    this.uiContainer.style.width = '100%';
-    this.uiContainer.style.height = '100%';
-    this.uiContainer.style.top = '0';
-    this.uiContainer.style.left = '0';
-    this.uiContainer.style.pointerEvents = 'none';
-    document.body.appendChild(this.uiContainer);
-    
-    // Country selection UI
-    this.countrySelectionUI = document.createElement('div');
-    this.countrySelectionUI.id = 'country-selection';
-    this.countrySelectionUI.style.position = 'absolute';
-    this.countrySelectionUI.style.top = '50%';
-    this.countrySelectionUI.style.left = '50%';
-    this.countrySelectionUI.style.transform = 'translate(-50%, -50%)';
-    this.countrySelectionUI.style.background = 'rgba(255, 255, 255, 0.9)';
-    this.countrySelectionUI.style.padding = '20px';
-    this.countrySelectionUI.style.borderRadius = '10px';
-    this.countrySelectionUI.style.pointerEvents = 'auto';
-    this.countrySelectionUI.style.display = 'none';
-    this.uiContainer.appendChild(this.countrySelectionUI);
-    
-    // Scenario UI
-    this.scenarioUI = document.createElement('div');
-    this.scenarioUI.id = 'scenario-ui';
-    this.scenarioUI.style.position = 'absolute';
-    this.scenarioUI.style.bottom = '20px';
-    this.scenarioUI.style.left = '50%';
-    this.scenarioUI.style.transform = 'translateX(-50%)';
-    this.scenarioUI.style.background = 'rgba(255, 255, 255, 0.9)';
-    this.scenarioUI.style.padding = '20px';
-    this.scenarioUI.style.borderRadius = '10px';
-    this.scenarioUI.style.maxWidth = '80%';
-    this.scenarioUI.style.pointerEvents = 'auto';
-    this.scenarioUI.style.display = 'none';
-    this.uiContainer.appendChild(this.scenarioUI);
-    
-    // Feedback UI
-    this.feedbackUI = document.createElement('div');
-    this.feedbackUI.id = 'feedback-ui';
-    this.feedbackUI.style.position = 'absolute';
-    this.feedbackUI.style.top = '50%';
-    this.feedbackUI.style.left = '50%';
-    this.feedbackUI.style.transform = 'translate(-50%, -50%)';
-    this.feedbackUI.style.background = 'rgba(255, 255, 255, 0.95)';
-    this.feedbackUI.style.padding = '20px';
-    this.feedbackUI.style.borderRadius = '10px';
-    this.feedbackUI.style.maxWidth = '80%';
-    this.feedbackUI.style.pointerEvents = 'auto';
-    this.feedbackUI.style.display = 'none';
-    this.uiContainer.appendChild(this.feedbackUI);
-    
-    // Score display
-    this.scoreDisplay = document.createElement('div');
-    this.scoreDisplay.id = 'score-display';
-    this.scoreDisplay.style.position = 'absolute';
-    this.scoreDisplay.style.top = '20px';
-    this.scoreDisplay.style.right = '20px';
-    this.scoreDisplay.style.background = 'rgba(255, 255, 255, 0.8)';
-    this.scoreDisplay.style.padding = '10px';
-    this.scoreDisplay.style.borderRadius = '5px';
-    this.scoreDisplay.style.pointerEvents = 'none';
-    this.uiContainer.appendChild(this.scoreDisplay);
-    this.updateScoreDisplay();
-  }
-  
-  updateScoreDisplay() {
-    this.scoreDisplay.innerHTML = `<h3>Cultural Competence: ${this.playerScore}</h3>`;
-  }
-  
   showCountrySelection() {
+    console.log("Showing country selection...");
+    
+    // Get the country selection UI element
+    const countrySelectionUI = document.getElementById('country-selection');
+    
     // Clear previous content
-    this.countrySelectionUI.innerHTML = '';
+    countrySelectionUI.innerHTML = '';
     
     // Add title
     const title = document.createElement('h2');
     title.textContent = 'Global Business Quest';
-    this.countrySelectionUI.appendChild(title);
+    countrySelectionUI.appendChild(title);
     
     // Add subtitle
     const subtitle = document.createElement('p');
     subtitle.textContent = 'Select a country to begin your business adventure:';
-    this.countrySelectionUI.appendChild(subtitle);
+    countrySelectionUI.appendChild(subtitle);
     
     // Create country buttons
     Object.keys(this.countries).forEach(countryId => {
@@ -488,48 +433,44 @@ class GlobalBusinessQuest {
         const country = this.countries[countryId];
         
         const countryButton = document.createElement('div');
-        countryButton.style.margin = '15px 0';
-        countryButton.style.padding = '15px';
-        countryButton.style.background = '#f0f0f0';
-        countryButton.style.borderRadius = '5px';
-        countryButton.style.cursor = 'pointer';
-        countryButton.style.transition = 'background 0.3s';
+        countryButton.classList.add('country-button');
         
         countryButton.innerHTML = `
           <h3>${country.name}</h3>
           <p>${country.description}</p>
         `;
         
-        countryButton.addEventListener('mouseover', () => {
-          countryButton.style.background = '#e0e0e0';
-        });
-        
-        countryButton.addEventListener('mouseout', () => {
-          countryButton.style.background = '#f0f0f0';
-        });
-        
         countryButton.addEventListener('click', () => {
           this.selectCountry(countryId);
         });
         
-        this.countrySelectionUI.appendChild(countryButton);
+        countrySelectionUI.appendChild(countryButton);
       }
     });
     
     // Display the country selection UI
-    this.countrySelectionUI.style.display = 'block';
-    this.scenarioUI.style.display = 'none';
-    this.feedbackUI.style.display = 'none';
+    countrySelectionUI.style.display = 'block';
+    document.getElementById('scenario-ui').style.display = 'none';
+    document.getElementById('feedback-ui').style.display = 'none';
+    
+    // Update score display
+    this.updateScoreDisplay();
+  }
+  
+  updateScoreDisplay() {
+    const scoreDisplay = document.getElementById('score-display');
+    scoreDisplay.innerHTML = `<h3>Cultural Competence: ${this.playerScore}</h3>`;
   }
   
   selectCountry(countryId) {
+    console.log("Country selected:", countryId);
     this.currentCountry = countryId;
     
     // Load the country's 3D scene
     this.loadCountryScene(countryId);
     
     // Hide country selection UI
-    this.countrySelectionUI.style.display = 'none';
+    document.getElementById('country-selection').style.display = 'none';
     
     // Show first scenario
     const scenarios = this.countries[countryId].scenarios;
@@ -539,14 +480,19 @@ class GlobalBusinessQuest {
   }
   
   startScenario(scenarioId) {
+    console.log("Starting scenario:", scenarioId);
+    
     // Find scenario
     const scenario = this.countries[this.currentCountry].scenarios.find(s => s.id === scenarioId);
     this.currentScenario = scenario;
     
     if (!scenario) return;
     
+    // Get scenario UI
+    const scenarioUI = document.getElementById('scenario-ui');
+    
     // Set up scenario UI
-    this.scenarioUI.innerHTML = `
+    scenarioUI.innerHTML = `
       <h3>${scenario.title}</h3>
       <p>${scenario.description}</p>
     `;
@@ -557,14 +503,19 @@ class GlobalBusinessQuest {
     }
     
     // Display scenario UI
-    this.scenarioUI.style.display = 'block';
+    scenarioUI.style.display = 'block';
   }
   
   showInteraction(interaction) {
+    console.log("Showing interaction:", interaction.id);
+    
+    // Get scenario UI
+    const scenarioUI = document.getElementById('scenario-ui');
+    
     // Add interaction to UI
     const interactionContainer = document.createElement('div');
     interactionContainer.innerHTML = `<p class="prompt">${interaction.prompt}</p>`;
-    this.scenarioUI.appendChild(interactionContainer);
+    scenarioUI.appendChild(interactionContainer);
     
     // Add options
     const optionsContainer = document.createElement('div');
@@ -573,15 +524,7 @@ class GlobalBusinessQuest {
     interaction.options.forEach(option => {
       const optionButton = document.createElement('button');
       optionButton.textContent = option.text;
-      optionButton.style.display = 'block';
-      optionButton.style.width = '100%';
-      optionButton.style.padding = '10px';
-      optionButton.style.margin = '10px 0';
-      optionButton.style.background = '#4c72b0';
-      optionButton.style.color = 'white';
-      optionButton.style.border = 'none';
-      optionButton.style.borderRadius = '5px';
-      optionButton.style.cursor = 'pointer';
+      optionButton.classList.add('option-button');
       
       optionButton.addEventListener('click', () => {
         this.selectOption(interaction, option);
@@ -590,12 +533,14 @@ class GlobalBusinessQuest {
       optionsContainer.appendChild(optionButton);
     });
     
-    this.scenarioUI.appendChild(optionsContainer);
+    scenarioUI.appendChild(optionsContainer);
   }
   
   selectOption(interaction, selectedOption) {
-    // Clear the scenario UI
-    this.scenarioUI.style.display = 'none';
+    console.log("Option selected:", selectedOption.text);
+    
+    // Hide the scenario UI
+    document.getElementById('scenario-ui').style.display = 'none';
     
     // Show feedback
     this.showFeedback(selectedOption);
@@ -612,63 +557,67 @@ class GlobalBusinessQuest {
     
     // Set timeout to continue
     setTimeout(() => {
-      this.feedbackUI.style.display = 'none';
+      document.getElementById('feedback-ui').style.display = 'none';
       
       if (nextInteraction) {
         // Show next interaction
-        this.scenarioUI.style.display = 'block';
+        document.getElementById('scenario-ui').style.display = 'block';
         this.showInteraction(nextInteraction);
       } else {
         // End of scenario
         this.endScenario();
       }
-    }, 4000);
+    }, 3000);
   }
   
   showFeedback(option) {
+    console.log("Showing feedback");
+    
+    // Get feedback UI
+    const feedbackUI = document.getElementById('feedback-ui');
+    
     // Create feedback content
-    this.feedbackUI.innerHTML = '';
+    feedbackUI.innerHTML = '';
     
     const result = document.createElement('h3');
     result.textContent = option.correct ? 'Correct!' : 'Not quite right';
     result.style.color = option.correct ? '#28a745' : '#dc3545';
-    this.feedbackUI.appendChild(result);
+    feedbackUI.appendChild(result);
     
     const feedback = document.createElement('p');
     feedback.textContent = option.feedback;
-    this.feedbackUI.appendChild(feedback);
+    feedbackUI.appendChild(feedback);
     
     // Display feedback UI
-    this.feedbackUI.style.display = 'block';
+    feedbackUI.style.display = 'block';
   }
   
   endScenario() {
+    console.log("Scenario complete");
+    
+    // Get feedback UI
+    const feedbackUI = document.getElementById('feedback-ui');
+    
     // Show scenario completion message
-    this.feedbackUI.innerHTML = `
+    feedbackUI.innerHTML = `
       <h3>Scenario Complete!</h3>
       <p>You've completed this business scenario.</p>
-      <button id="continue-button">Continue</button>
+      <button id="continue-button" class="continue-button">Continue</button>
     `;
     
-    const continueButton = document.getElementById('continue-button');
-    continueButton.style.padding = '10px 20px';
-    continueButton.style.background = '#4c72b0';
-    continueButton.style.color = 'white';
-    continueButton.style.border = 'none';
-    continueButton.style.borderRadius = '5px';
-    continueButton.style.cursor = 'pointer';
-    continueButton.style.marginTop = '15px';
-    
-    continueButton.addEventListener('click', () => {
-      this.feedbackUI.style.display = 'none';
+    // Add event listener to the continue button
+    document.getElementById('continue-button').addEventListener('click', () => {
+      feedbackUI.style.display = 'none';
       this.showCountrySelection();
     });
     
-    this.feedbackUI.style.display = 'block';
+    // Display feedback UI
+    feedbackUI.style.display = 'block';
   }
 }
 
 // Initialize the game when page loads
-window.onload = () => {
+window.addEventListener('DOMContentLoaded', () => {
+  console.log("DOM fully loaded, initializing game...");
   const game = new GlobalBusinessQuest();
-};
+});
