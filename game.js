@@ -1,6 +1,10 @@
 // Global Business Quest - Three.js Implementation
 // This file sets up the core game environment and mechanics
-
+// At the start of your game.js file, add this check:
+if (!window.WebGLRenderingContext) {
+  alert('Your browser does not support WebGL. Please use a modern browser.');
+  return;
+}
 // Import Three.js and necessary modules
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
