@@ -156,22 +156,20 @@ class GlobalBusinessQuest {
         }
         
         // Load the country environment
-        createCountryEnvironment(this.scene, countryId)
-            .then(environment => {
-                this.activeEnvironment = environment;
-                
-                // Position camera appropriately
-                this.camera.position.set(0, 2, 4);
-                this.camera.lookAt(0, 0.5, 0);
-                
-                // Start first scenario
-                this.startScenario(country.scenarios[0]);
-            })
-            .catch(error => {
-                console.error("Error creating country environment:", error);
-                document.getElementById('error-display').innerHTML = `Error creating environment: ${error.message}`;
-                document.getElementById('error-display').style.display = 'block';
-            });
+        try {
+            this.activeEnvironment = createCountryEnvironment(this.scene, countryId);
+            
+            // Position camera appropriately
+            this.camera.position.set(0, 2, 4);
+            this.camera.lookAt(0, 0.5, 0);
+            
+            // Start first scenario
+            this.startScenario(country.scenarios[0]);
+        } catch (error) {
+            console.error("Error creating country environment:", error);
+            document.getElementById('error-display').innerHTML = `Error creating environment: ${error.message}`;
+            document.getElementById('error-display').style.display = 'block';
+        }
     }
     
     startScenario(scenario) {
