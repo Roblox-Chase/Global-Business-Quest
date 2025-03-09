@@ -14,7 +14,6 @@ import {
 } from 'three';
 
 import * as THREE from 'three';
-
 export const countries = {
     japan: {
         name: 'Japan',
@@ -48,7 +47,6 @@ export const countries = {
                             }
                         ]
                     },
-                    // Additional interactions for Tokyo scenario
                     {
                         id: 'business_cards',
                         situation: 'Your Japanese counterpart presents you with their business card (meishi).',
@@ -68,6 +66,94 @@ export const countries = {
                                 text: 'Take it, write notes on it, and fold it in half', 
                                 correct: false,
                                 feedback: 'Writing on someone\'s business card or folding/bending it is seen as extremely disrespectful in Japanese business culture.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'seating',
+                        situation: 'Everyone is about to sit down for the meeting. The most senior executive from the Japanese company is present.',
+                        prompt: 'Where should you sit?',
+                        options: [
+                            { 
+                                text: 'Wait to be directed to your seat by your Japanese host', 
+                                correct: true,
+                                feedback: 'Correct! In Japan, seating arrangements often follow hierarchical order. It\'s best to wait for guidance rather than choosing a seat yourself, as some positions may be reserved for senior executives.' 
+                            },
+                            { 
+                                text: 'Take the seat at the head of the table to show confidence', 
+                                correct: false,
+                                feedback: 'This could be seen as presumptuous. The seat at the head of the table is typically reserved for the most senior person, and taking it without invitation might appear disrespectful.' 
+                            },
+                            { 
+                                text: 'Sit anywhere you like, as it doesn\'t matter in modern Japanese business', 
+                                correct: false,
+                                feedback: 'While Japanese business is modernizing, traditional protocols around seating still matter. Hierarchy is important, and seating often reflects this hierarchy.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'small_talk',
+                        situation: 'As the meeting begins, there\'s a moment for introductory conversation.',
+                        prompt: 'What topic would be most appropriate to discuss initially?',
+                        options: [
+                            { 
+                                text: 'Express appreciation for Japanese culture and perhaps mention a positive observation about their office', 
+                                correct: true,
+                                feedback: 'Correct! Showing genuine interest in and respect for Japanese culture helps build rapport. Keeping the conversation positive and impersonal is appropriate for initial meetings.' 
+                            },
+                            { 
+                                text: 'Immediately discuss business objectives and financials to show you\'re serious', 
+                                correct: false,
+                                feedback: 'In Japan, building relationship comes before business transactions. Jumping straight into business matters could be perceived as too abrupt and may hamper relationship-building.' 
+                            },
+                            { 
+                                text: 'Share a humorous anecdote about cultural differences you\'ve experienced in Japan', 
+                                correct: false,
+                                feedback: 'Humor about cultural differences can easily be misinterpreted and might accidentally cause offense. It\'s safer to keep initial conversations respectful and somewhat formal.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'disagreement',
+                        situation: 'During the presentation, you notice an error in the figures presented by your Japanese counterpart.',
+                        prompt: 'How should you address this mistake?',
+                        options: [
+                            { 
+                                text: 'Discreetly suggest discussing the figures in more detail later, or phrase it as a question', 
+                                correct: true,
+                                feedback: 'Correct! In Japanese business culture, preserving harmony (wa) and saving face are important. Pointing out errors directly can cause embarrassment. A subtle approach or framing your concern as a question is more appropriate.' 
+                            },
+                            { 
+                                text: 'Immediately point out the error to demonstrate your attention to detail', 
+                                correct: false,
+                                feedback: 'Directly pointing out someone\'s mistake, especially in front of others, can cause them to lose face, which is to be avoided in Japanese culture. This approach could damage your business relationship.' 
+                            },
+                            { 
+                                text: 'Ignore the error since it\'s not significant enough to mention', 
+                                correct: false,
+                                feedback: 'While preserving harmony is important, ignoring substantive errors entirely isn\'t productive. Finding a tactful way to address the issue shows you\'re engaged while still respecting cultural norms.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'gift_giving',
+                        situation: 'You\'ve brought a gift for your Japanese business partners.',
+                        prompt: 'When and how should you present it?',
+                        options: [
+                            { 
+                                text: 'At the end of the meeting, present it modestly with both hands and a slight bow', 
+                                correct: true,
+                                feedback: 'Correct! Gift-giving is common in Japanese business culture, but timing and presentation matter. Presenting it at the end of the meeting with both hands shows respect. Being modest about the gift\'s value is also culturally appropriate.' 
+                            },
+                            { 
+                                text: 'As soon as you arrive, prominently display and explain why you chose something expensive', 
+                                correct: false,
+                                feedback: 'Beginning with gift-giving could create an awkward obligation before the meeting starts. Additionally, emphasizing the gift\'s expense could cause discomfort, as modesty is valued in Japanese culture.' 
+                            },
+                            { 
+                                text: 'Ask your counterpart when they would like to receive the gift you brought', 
+                                correct: false,
+                                feedback: 'While this might seem considerate, it puts your Japanese counterpart in an awkward position. In Japan, gift-giving follows implicit protocols, and asking directly could create unnecessary discomfort.' 
                             }
                         ]
                     }
@@ -108,7 +194,6 @@ export const countries = {
                             }
                         ]
                     },
-                    // Additional interactions for Paris scenario
                     {
                         id: 'wine_selection',
                         situation: 'The waiter asks if you would like to select the wine for the table.',
@@ -128,6 +213,94 @@ export const countries = {
                                 text: 'Decline wine altogether, stating you don\'t drink during business meetings', 
                                 correct: false,
                                 feedback: 'In French business culture, sharing wine during a business lunch is normal and refusing could seem rigid. It\'s perfectly acceptable to have a small amount or sip slowly if you prefer not to drink much.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'conversation_topic',
+                        situation: 'The conversation begins as you wait for your appetizers to arrive.',
+                        prompt: 'What topic would be most appropriate to discuss?',
+                        options: [
+                            { 
+                                text: 'French cuisine, culture, or current events in France', 
+                                correct: true,
+                                feedback: 'Correct! French business lunches typically begin with cultural conversation. Showing interest in French culture, cuisine, or current events demonstrates respect and helps build rapport before diving into business matters.' 
+                            },
+                            { 
+                                text: 'Immediately discuss business objectives to make efficient use of time', 
+                                correct: false,
+                                feedback: 'In France, business lunches are as much about relationship-building as they are about business. Jumping straight into business talk might be perceived as too direct or lacking social grace.' 
+                            },
+                            { 
+                                text: 'Bring up your company\'s successful market performance and growth', 
+                                correct: false,
+                                feedback: 'Starting with talk about your own company\'s success could come across as boastful. French business culture appreciates modesty and intellectual conversation before business discussions.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'meal_pace',
+                        situation: 'Your main course has arrived, but you notice your French colleagues are taking their time with their food while the conversation continues.',
+                        prompt: 'How should you approach eating your meal?',
+                        options: [
+                            { 
+                                text: 'Follow their lead, eating slowly and continuing to engage in conversation', 
+                                correct: true,
+                                feedback: 'Correct! In France, business lunches are usually leisurely affairs where the meal and conversation are equally important. Rushing through your food could be seen as uncultured or impatient.' 
+                            },
+                            { 
+                                text: 'Eat quickly so you can focus entirely on the business discussion afterward', 
+                                correct: false,
+                                feedback: 'Eating quickly during a French business lunch might appear rude or suggest you don\'t appreciate the dining experience. In France, appreciating food is important, and meals are meant to be savored.' 
+                            },
+                            { 
+                                text: 'Focus on finishing your meal before continuing significant conversation', 
+                                correct: false,
+                                feedback: 'Separating eating from conversation isn\'t typical in French business lunches. The ability to dine and discuss simultaneously is appreciated, and conversation should flow throughout the meal.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'business_timing',
+                        situation: 'You\'re halfway through the lunch and still discussing cultural topics.',
+                        prompt: 'When is it appropriate to transition to business topics?',
+                        options: [
+                            { 
+                                text: 'Wait for your French counterparts to initiate business talk, typically around dessert or coffee', 
+                                correct: true,
+                                feedback: 'Correct! In French business culture, it\'s customary for serious business discussion to begin later in the meal, often around dessert or coffee. Following your host\'s lead shows respect for local customs.' 
+                            },
+                            { 
+                                text: 'Politely but firmly redirect the conversation to business matters now', 
+                                correct: false,
+                                feedback: 'Forcing the conversation toward business before your French counterparts are ready could be perceived as pushy or showing a lack of appreciation for relationship-building, which is fundamental in French business culture.' 
+                            },
+                            { 
+                                text: 'Suggest that you schedule a separate meeting for business discussions', 
+                                correct: false,
+                                feedback: 'This suggests you don\'t understand the purpose of a French business lunch, which is to combine relationship-building with business discussion. Business matters are expected to be discussed, just at the appropriate time.' 
+                            }
+                        ]
+                    },
+                    {
+                        id: 'bill_payment',
+                        situation: 'The meal is concluding, and the waiter brings the check.',
+                        prompt: 'What should you do about the bill?',
+                        options: [
+                            { 
+                                text: 'If you were invited, graciously thank your host; if you invited them, discreetly pay the bill', 
+                                correct: true,
+                                feedback: 'Correct! In France, typically the person who extended the invitation pays the bill. If you were invited, attempting to pay could even be seen as slightly insulting to your host. If you invited them, paying discreetly without drawing attention to the cost is most appropriate.' 
+                            },
+                            { 
+                                text: 'Offer to split the bill evenly between all attendees', 
+                                correct: false,
+                                feedback: 'Suggesting to split the bill in a French business context could appear unsophisticated or even stingy. Business meals in France typically follow the "inviter pays" principle rather than splitting costs.' 
+                            },
+                            { 
+                                text: 'Insist on paying the entire bill regardless of who invited whom', 
+                                correct: false,
+                                feedback: 'Insisting on paying when you were invited could cause discomfort and might even offend your French host, as it could imply they cannot afford to host you properly. Follow the established etiquette of "inviter pays."' 
                             }
                         ]
                     }
@@ -214,6 +387,9 @@ function createJapanEnvironment(scene) {
     
     // Add laptop
     createSimpleLaptop(scene, 0, 0.61, 0);
+    
+    // Add gift box representing omiyage (gift-giving is part of business culture)
+    createGiftBox(scene, -0.8, 0.61, 0.4);
     
     return {
         animate: (time) => {
@@ -311,6 +487,42 @@ function createSimpleLaptop(scene, x, y, z) {
     scene.add(screen);
 }
 
+function createGiftBox(scene, x, y, z) {
+    // Gift box - representing omiyage (gift exchange is important in Japanese business)
+    const boxGeometry = new THREE.BoxGeometry(0.2, 0.1, 0.15);
+    const boxMaterial = new THREE.MeshStandardMaterial({ color: 0xE60026 }); // Red is an auspicious color
+    const box = new THREE.Mesh(boxGeometry, boxMaterial);
+    box.position.set(x, y, z);
+    scene.add(box);
+    
+    // Ribbon
+    const ribbonMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700 });
+    
+    // Horizontal ribbon
+    const hRibbonGeometry = new THREE.BoxGeometry(0.22, 0.02, 0.03);
+    const hRibbon = new THREE.Mesh(hRibbonGeometry, ribbonMaterial);
+    hRibbon.position.set(x, y + 0.06, z);
+    scene.add(hRibbon);
+    
+    // Vertical ribbon
+    const vRibbonGeometry = new THREE.BoxGeometry(0.03, 0.02, 0.17);
+    const vRibbon = new THREE.Mesh(vRibbonGeometry, ribbonMaterial);
+    vRibbon.position.set(x, y + 0.06, z);
+    scene.add(vRibbon);
+    
+    // Bow
+    const bowGeometry = new THREE.TorusGeometry(0.03, 0.01, 16, 16);
+    const leftBow = new THREE.Mesh(bowGeometry, ribbonMaterial);
+    leftBow.position.set(x - 0.03, y + 0.07, z);
+    leftBow.rotation.y = Math.PI / 2;
+    scene.add(leftBow);
+    
+    const rightBow = new THREE.Mesh(bowGeometry, ribbonMaterial);
+    rightBow.position.set(x + 0.03, y + 0.07, z);
+    rightBow.rotation.y = Math.PI / 2;
+    scene.add(rightBow);
+}
+
 // Create France restaurant environment
 function createFranceEnvironment(scene) {
     // Create enhanced French restaurant environment
@@ -337,6 +549,12 @@ function createFranceEnvironment(scene) {
     
     // Add a simple bar counter
     createSimpleBar(scene);
+    
+    // Add bread basket (important in French dining)
+    createBreadBasket(scene, 0.4, 0.5, 0);
+    
+    // Add menu card
+    createMenuCard(scene, -0.4, 0.5, 0.2);
     
     return {
         animate: (time) => {
@@ -394,218 +612,9 @@ function createFrenchTable(scene, x, y, z, isMain) {
             
             // Wine glass
             createWineGlass(scene, plateX + 0.2, y + 0.5, plateZ);
+            
+            // Add silverware
+            createSilverware(scene, plateX, y + 0.56, plateZ);
         }
         
-        // Add candle and wine bottle
-        createSimpleCandle(scene, x, y + 0.5, z);
-        createSimpleWineBottle(scene, x - 0.3, y + 0.5, z);
-    }
-}
-
-function createFrenchChair(scene, x, y, z, rotation) {
-    // Chair seat
-    const seatGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.05, 16);
-    const seatMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    const seat = new THREE.Mesh(seatGeometry, seatMaterial);
-    seat.position.set(x, y + 0.45, z);
-    scene.add(seat);
-    
-    // Chair back
-    const backMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    for (let i = -0.15; i <= 0.15; i += 0.1) {
-        const backGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.4, 8);
-        const back = new THREE.Mesh(backGeometry, backMaterial);
-        back.position.set(
-            x + Math.sin(rotation) * (0.2 + Math.abs(i/2)),
-            y + 0.65,
-            z + Math.cos(rotation) * (0.2 + Math.abs(i/2))
-        );
-        back.rotation.y = rotation;
-        scene.add(back);
-    }
-    
-    // Chair legs
-    const legGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.45, 8);
-    const legMaterial = new THREE.MeshStandardMaterial({ color: 0x5C4033 });
-    
-    for (let i = 0; i < 4; i++) {
-        const legAngle = rotation + (i * Math.PI / 2) + (Math.PI / 4);
-        const leg = new THREE.Mesh(legGeometry, legMaterial);
-        leg.position.set(
-            x + Math.sin(legAngle) * 0.2,
-            y + 0.22,
-            z + Math.cos(legAngle) * 0.2
-        );
-        scene.add(leg);
-    }
-}
-
-function createWineGlass(scene, x, y, z) {
-    // Stem
-    const stemGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.15, 8);
-    const glassMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0xF5F5F5,
-        transparent: true,
-        opacity: 0.5
-    });
-    const stem = new THREE.Mesh(stemGeometry, glassMaterial);
-    stem.position.set(x, y + 0.075, z);
-    scene.add(stem);
-    
-    // Base
-    const baseGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.01, 16);
-    const base = new THREE.Mesh(baseGeometry, glassMaterial);
-    base.position.set(x, y, z);
-    scene.add(base);
-    
-    // Cup
-    const cupGeometry = new THREE.CylinderGeometry(0, 0.06, 0.1, 16);
-    const cup = new THREE.Mesh(cupGeometry, glassMaterial);
-    cup.position.set(x, y + 0.15, z);
-    scene.add(cup);
-    
-    // Wine (randomly in some glasses)
-    if (Math.random() > 0.5) {
-        const wineGeometry = new THREE.CylinderGeometry(0, 0.05, 0.04, 16);
-        const wineMaterial = new THREE.MeshStandardMaterial({ 
-            color: 0x8B0000,
-            transparent: true,
-            opacity: 0.7
-        });
-        const wine = new THREE.Mesh(wineGeometry, wineMaterial);
-        wine.position.set(x, y + 0.12, z);
-        scene.add(wine);
-    }
-}
-
-function createSimpleCandle(scene, x, y, z) {
-    // Candle base
-    const baseGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.02, 16);
-    const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xC0C0C0 });
-    const base = new THREE.Mesh(baseGeometry, baseMaterial);
-    base.position.set(x, y + 0.01, z);
-    scene.add(base);
-    
-    // Candle
-    const candleGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.12, 16);
-    const candleMaterial = new THREE.MeshStandardMaterial({ color: 0xFFF8DC });
-    const candle = new THREE.Mesh(candleGeometry, candleMaterial);
-    candle.position.set(x, y + 0.08, z);
-    scene.add(candle);
-    
-    // Flame
-    const flameGeometry = new THREE.ConeGeometry(0.01, 0.03, 8);
-    const flameMaterial = new THREE.MeshBasicMaterial({ color: 0xFFDD00 });
-    const flame = new THREE.Mesh(flameGeometry, flameMaterial);
-    flame.position.set(x, y + 0.155, z);
-    flame.name = 'flame';
-    scene.add(flame);
-    
-    // Light
-    const light = new THREE.PointLight(0xFFDD00, 0.3, 1);
-    light.position.set(x, y + 0.155, z);
-    scene.add(light);
-}
-
-function createSimpleWineBottle(scene, x, y, z) {
-    // Bottle
-    const bottleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.2, 16);
-    const bottleMaterial = new THREE.MeshStandardMaterial({ 
-        color: 0x006400,
-        transparent: true,
-        opacity: 0.8
-    });
-    const bottle = new THREE.Mesh(bottleGeometry, bottleMaterial);
-    bottle.position.set(x, y + 0.1, z);
-    scene.add(bottle);
-    
-    // Bottle neck
-    const neckGeometry = new THREE.CylinderGeometry(0.02, 0.03, 0.1, 16);
-    const neck = new THREE.Mesh(neckGeometry, bottleMaterial);
-    neck.position.set(x, y + 0.25, z);
-    scene.add(neck);
-    
-    // Bottle cap
-    const capGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.02, 16);
-    const capMaterial = new THREE.MeshStandardMaterial({ color: 0x8B0000 });
-    const cap = new THREE.Mesh(capGeometry, capMaterial);
-    cap.position.set(x, y + 0.31, z);
-    scene.add(cap);
-}
-
-function createSimpleFrenchFlag(scene) {
-    // Frame
-    const frameGeometry = new THREE.BoxGeometry(0.05, 0.8, 1.2);
-    const frameMaterial = new THREE.MeshStandardMaterial({ color: 0xD4AF37 });
-    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
-    frame.position.set(-4.95, 2, 0);
-    scene.add(frame);
-    
-    // Blue part
-    const blueGeometry = new THREE.PlaneGeometry(0.3, 0.6);
-    const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0055A4 });
-    const blue = new THREE.Mesh(blueGeometry, blueMaterial);
-    blue.position.set(-4.9, 2, -0.3);
-    blue.rotation.y = Math.PI / 2;
-    scene.add(blue);
-    
-    // White part
-    const whiteGeometry = new THREE.PlaneGeometry(0.3, 0.6);
-    const whiteMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
-    const white = new THREE.Mesh(whiteGeometry, whiteMaterial);
-    white.position.set(-4.9, 2, 0);
-    white.rotation.y = Math.PI / 2;
-    scene.add(white);
-    
-    // Red part
-    const redGeometry = new THREE.PlaneGeometry(0.3, 0.6);
-    const redMaterial = new THREE.MeshBasicMaterial({ color: 0xEF4135 });
-    const red = new THREE.Mesh(redGeometry, redMaterial);
-    red.position.set(-4.9, 2, 0.3);
-    red.rotation.y = Math.PI / 2;
-    scene.add(red);
-}
-
-function createSimpleBar(scene) {
-    // Bar counter
-    const counterGeometry = new THREE.BoxGeometry(3, 1, 0.8);
-    const counterMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-    const counter = new THREE.Mesh(counterGeometry, counterMaterial);
-    counter.position.set(-3, 0.5, -4);
-    scene.add(counter);
-    
-    // Bar top
-    const topGeometry = new THREE.BoxGeometry(3.2, 0.1, 1);
-    const topMaterial = new THREE.MeshStandardMaterial({ color: 0x2F4F4F });
-    const top = new THREE.Mesh(topGeometry, topMaterial);
-    top.position.set(-3, 1, -4);
-    scene.add(top);
-    
-    // Bottles on shelf
-    for (let i = 0; i < 5; i++) {
-        const bottleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.25, 16);
-        const bottleMaterial = new THREE.MeshStandardMaterial({ 
-            color: Math.random() * 0xFFFFFF,
-            transparent: true,
-            opacity: 0.7
-        });
-        const bottle = new THREE.Mesh(bottleGeometry, bottleMaterial);
-        bottle.position.set(-4 + i * 0.5, 1.1, -4.3);
-        scene.add(bottle);
-    }
-    
-    // Bar stools
-    for (let i = -1; i <= 1; i++) {
-        const stoolGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 16);
-        const stoolMaterial = new THREE.MeshStandardMaterial({ color: 0x8B0000 });
-        const stool = new THREE.Mesh(stoolGeometry, stoolMaterial);
-        stool.position.set(-3 + i * 1, 0.8, -3);
-        scene.add(stool);
-        
-        const legGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.8, 8);
-        const legMaterial = new THREE.MeshStandardMaterial({ color: 0x696969 });
-        const leg = new THREE.Mesh(legGeometry, legMaterial);
-        leg.position.set(-3 + i * 1, 0.4, -3);
-        scene.add(leg);
-    }
-}
+        // Ad
