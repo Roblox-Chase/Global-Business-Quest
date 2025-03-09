@@ -4,97 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Business Quest</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        #ui-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-        #country-selection {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            pointer-events: auto;
-            display: none;
-            max-width: 80%;
-        }
-        #scenario-ui {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            pointer-events: auto;
-            display: none;
-        }
-        #feedback-ui {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            pointer-events: auto;
-            display: none;
-        }
-        #score-display {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            pointer-events: none;
-        }
-        .country-button {
-            margin: 15px 0;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .country-button:hover {
-            background: #e0e0e0;
-        }
-        .option-button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background: #4c72b0;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .continue-button {
-            padding: 10px 20px;
-            background: #4c72b0;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="game-container"></div>
@@ -105,7 +15,6 @@
         <div id="feedback-ui"></div>
         <div id="score-display"></div>
     </div>
-
     <script type="importmap">
     {
       "imports": {
