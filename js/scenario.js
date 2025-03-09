@@ -315,5 +315,5 @@ const additionalScenarios = {
   }
 };
 
-// Export ScenarioManager for use in the main game
-export { ScenarioManager, additionalScenarios };
+// Export all necessary items for use in the main game
+export { Scenario, ScenarioManager, additionalScenarios };
