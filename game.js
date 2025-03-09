@@ -6,13 +6,13 @@ import * as THREE from 'https://unpkg.com/three@0.174.0/build/three.module.js';
 import { OrbitControls } from 'https://unpkg.com/three@0.174.0/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'https://unpkg.com/three@0.174.0/examples/jsm/loaders/GLTFLoader.js';
 
-// For local implementation, we'll skip the other imports and include simple implementations
-// Import { InteractionManager, enhancedInteractions } from './interactions.js';
-// Import { ScenarioManager, additionalScenarios } from './scenarios.js';
-// Import { UIManager } from './ui.js';
-// Import { TokyoOfficeEnvironment } from './countries/TokyoOfficeEnvironment.js';
-// Import { ParisRestaurantEnvironment } from './countries/ParisRestaurantEnvironment.js';
-// Import { textureManager } from './utils/textures.js';
+
+import { InteractionManager, enhancedInteractions } from './interactions.js';
+import { ScenarioManager, additionalScenarios } from './scenarios.js';
+import { UIManager } from './ui.js';
+import { TokyoOfficeEnvironment } from './countries/TokyoOfficeEnvironment.js';
+import { ParisRestaurantEnvironment } from './countries/ParisRestaurantEnvironment.js';
+import { textureManager } from './utils/textures.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
