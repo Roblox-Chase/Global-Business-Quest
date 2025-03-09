@@ -9,6 +9,7 @@ import { ScenarioManager, additionalScenarios } from './js/scenarios.js';
 import { UIManager } from './js/ui.js';
 import { TokyoOfficeEnvironment } from './js/countries/TokyoOfficeEnvironment.js';
 import { ParisRestaurantEnvironment } from './js/countries/ParisRestaurantEnvironment.js';
+import { textureManager } from './utils/textures.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
