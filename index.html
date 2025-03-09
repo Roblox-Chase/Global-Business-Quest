@@ -3,18 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Business Quest</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Global Business Quest - Simplified</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        #game-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        #ui-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #country-selection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            pointer-events: auto;
+            max-width: 80%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        #error-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            z-index: 999;
+            display: none;
+        }
+        .country-button {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .country-button:hover {
+            background: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
     <div id="game-container"></div>
-
     <div id="ui-container">
         <div id="country-selection"></div>
-        <div id="scenario-ui"></div>
-        <div id="feedback-ui"></div>
-        <div id="score-display"></div>
     </div>
+    <div id="error-display"></div>
+
     <script type="importmap">
     {
       "imports": {
@@ -23,7 +78,240 @@
       }
     }
     </script>
+    
+    <script type="module">
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.message, e.filename, e.lineno);
+            const errorDisplay = document.getElementById('error-display');
+            errorDisplay.innerHTML = `
+                Error: ${e.message}<br>
+                File: ${e.filename}<br>
+                Line: ${e.lineno}
+            `;
+            errorDisplay.style.display = 'block';
+        });
 
-    <!-- Type module is essential for ES6 imports -->
-    <script type="module" src="game.js"></script>
+        // Import Three.js
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Simple country data
+        const countries = {
+            japan: {
+                name: 'Japan',
+                description: 'Navigate formal business meetings in Tokyo',
+                color: 0xf0f5ff // Light blue
+            },
+            france: {
+                name: 'France',
+                description: 'Learn the art of business lunches in Paris',
+                color: 0xf4f9ff // Soft blue
+            }
+        };
+
+        // Main Game Class
+        class SimpleBusinessQuest {
+            constructor() {
+                console.log("Starting Simple Business Quest...");
+                
+                // Game state
+                this.currentCountry = null;
+                
+                // Initialize Three.js
+                this.initThreeJS();
+                
+                // Show country selection
+                this.showCountrySelection();
+            }
+            
+            initThreeJS() {
+                console.log("Initializing Three.js...");
+                
+                try {
+                    // Scene
+                    this.scene = new THREE.Scene();
+                    this.scene.background = new THREE.Color(0x87CEEB);
+                    
+                    // Camera
+                    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                    this.camera.position.set(0, 1.6, 5);
+                    
+                    // Renderer
+                    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                    document.getElementById('game-container').appendChild(this.renderer.domElement);
+                    
+                    // Controls
+                    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+                    this.controls.enableDamping = true;
+                    
+                    // Add basic light and ground
+                    this.addLights();
+                    this.addGround();
+                    
+                    // Start animation loop
+                    this.animate();
+                    
+                    console.log("Three.js initialization complete!");
+                } catch (error) {
+                    console.error("Three.js initialization failed:", error);
+                    document.getElementById('error-display').innerHTML = `Three.js initialization failed: ${error.message}`;
+                    document.getElementById('error-display').style.display = 'block';
+                }
+            }
+            
+            addLights() {
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                this.scene.add(ambientLight);
+                
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+                dirLight.position.set(5, 10, 7.5);
+                this.scene.add(dirLight);
+            }
+            
+            addGround() {
+                const groundGeometry = new THREE.PlaneGeometry(100, 100);
+                const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x1a5e1a });
+                const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+                ground.rotation.x = -Math.PI / 2;
+                this.scene.add(ground);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                if (this.controls) {
+                    this.controls.update();
+                }
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+            
+            showCountrySelection() {
+                console.log("Showing country selection...");
+                
+                const countrySelectionUI = document.getElementById('country-selection');
+                countrySelectionUI.innerHTML = '';
+                
+                const title = document.createElement('h2');
+                title.textContent = 'Global Business Quest';
+                countrySelectionUI.appendChild(title);
+                
+                const subtitle = document.createElement('p');
+                subtitle.textContent = 'Select a country to begin your business adventure:';
+                countrySelectionUI.appendChild(subtitle);
+                
+                // Create country buttons
+                Object.keys(countries).forEach(countryId => {
+                    const country = countries[countryId];
+                    
+                    const countryButton = document.createElement('div');
+                    countryButton.classList.add('country-button');
+                    
+                    countryButton.innerHTML = `
+                        <h3>${country.name}</h3>
+                        <p>${country.description}</p>
+                    `;
+                    
+                    countryButton.addEventListener('click', () => {
+                        this.selectCountry(countryId);
+                    });
+                    
+                    countrySelectionUI.appendChild(countryButton);
+                });
+            }
+            
+            selectCountry(countryId) {
+                console.log("Country selected:", countryId);
+                this.currentCountry = countryId;
+                
+                // Change the scene background color based on the country
+                if (countries[countryId] && countries[countryId].color) {
+                    this.scene.background.set(countries[countryId].color);
+                }
+                
+                // Hide the country selection UI
+                document.getElementById('country-selection').style.display = 'none';
+                
+                // Create a simple scene based on the country
+                this.createSimpleCountryScene(countryId);
+            }
+            
+            createSimpleCountryScene(countryId) {
+                // Clear any existing objects (except ground and lights)
+                this.scene.children.forEach(child => {
+                    if (child instanceof THREE.Mesh && child.geometry instanceof THREE.PlaneGeometry) {
+                        // This is the ground, keep it
+                    } else if (child instanceof THREE.AmbientLight || child instanceof THREE.DirectionalLight) {
+                        // This is a light, keep it
+                    } else if (child instanceof THREE.Mesh) {
+                        // Remove other meshes
+                        this.scene.remove(child);
+                    }
+                });
+                
+                // Create a simple object representing the country
+                let geometry, material, mesh;
+                
+                if (countryId === 'japan') {
+                    // Create a simple representation of a Japanese office
+                    // Table
+                    geometry = new THREE.BoxGeometry(3, 0.2, 1.5);
+                    material = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.y = 0.5;
+                    this.scene.add(mesh);
+                    
+                    // Create some simple chairs
+                    for (let i = -1; i <= 1; i++) {
+                        const chairGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                        const chairMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                        const chair = new THREE.Mesh(chairGeometry, chairMaterial);
+                        chair.position.set(i, 0.25, 1);
+                        this.scene.add(chair);
+                    }
+                    
+                } else if (countryId === 'france') {
+                    // Create a simple representation of a French restaurant
+                    // Round table
+                    geometry = new THREE.CylinderGeometry(1, 1, 0.1, 32);
+                    material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.y = 0.5;
+                    this.scene.add(mesh);
+                    
+                    // Wine glasses
+                    for (let i = -0.5; i <= 0.5; i += 0.5) {
+                        const glassGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.3, 16);
+                        const glassMaterial = new THREE.MeshStandardMaterial({ 
+                            color: 0xF5F5F5,
+                            transparent: true,
+                            opacity: 0.5
+                        });
+                        const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+                        glass.position.set(i, 0.65, i);
+                        this.scene.add(glass);
+                    }
+                }
+                
+                // Position camera to view the scene
+                this.camera.position.set(0, 2, 4);
+                this.camera.lookAt(0, 0.5, 0);
+            }
+        }
+
+        // Start the game when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, initializing game...");
+            try {
+                const game = new SimpleBusinessQuest();
+            } catch (error) {
+                console.error("Failed to initialize game:", error);
+                document.getElementById('error-display').innerHTML = `Failed to initialize game: ${error.message}`;
+                document.getElementById('error-display').style.display = 'block';
+            }
+        });
+    </script>
 </body>
+</html>
