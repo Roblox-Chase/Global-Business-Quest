@@ -90,9 +90,55 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s;
+            position: relative;
         }
         .country-button:hover {
             background: #e0e0e0;
+        }
+        .country-button-content {
+            display: flex;
+            align-items: center;
+        }
+        .country-image {
+            width: 180px;
+            height: 120px;
+            overflow: hidden;
+            border-radius: 6px;
+            margin-right: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        .country-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .country-button:hover .country-image img {
+            transform: scale(1.05);
+        }
+        .country-info {
+            flex: 1;
+        }
+        .country-info h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .country-info p {
+            margin: 0;
+            color: #7f8c8d;
+        }
+        .competence-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
         }
         .option-button {
             display: block;
@@ -113,6 +159,32 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 15px;
+        }
+        .situation {
+            font-style: italic;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+        }
+        .prompt {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .country-button-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .country-image {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
         }
     </style>
 </head>
