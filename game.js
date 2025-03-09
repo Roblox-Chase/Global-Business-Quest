@@ -1,10 +1,12 @@
 // Global Business Quest - Three.js Implementation
 // This file sets up the core game environment and mechanics
-// At the start of your game.js file, add this check:
+
+// Check for WebGL support
 if (!window.WebGLRenderingContext) {
   alert('Your browser does not support WebGL. Please use a modern browser.');
-  return;
+  throw new Error('WebGL not supported');
 }
+
 // Import Three.js and necessary modules
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -53,7 +55,10 @@ class GlobalBusinessQuest {
     };
     
     // Three.js setup
-    this.initThreeJS();
+    if (!this.initThreeJS()) {
+      console.error("Failed to initialize Three.js, cannot continue");
+      return;
+    }
     
     // Initialize managers
     this.initManagers();
@@ -68,57 +73,85 @@ class GlobalBusinessQuest {
   initThreeJS() {
     console.log("Initializing Three.js...");
     
-    // Scene setup
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x87CEEB); // Sky blue background
-    
-    // Camera setup
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set(0, 1.6, 5); // Positioning camera at human eye level
-    
-    // Renderer setup
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.shadowMap.enabled = true;
-    
-    // Get the container and add the renderer
-    const container = document.getElementById('game-container');
-    container.appendChild(this.renderer.domElement);
-    
-    // Controls setup
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.enableDamping = true;
-    this.controls.dampingFactor = 0.05;
-    this.controls.maxPolarAngle = Math.PI / 2; // Prevent camera from going below ground
-    
-    // Lighting setup
-    this.addLights();
-    
-    // Basic ground
-    this.addGround();
-    
-    // Scene assets loader
-    this.loader = new GLTFLoader();
-    
-    // Handle window resize
-    window.addEventListener('resize', () => this.onWindowResize(), false);
-    
-    // Animation loop
-    this.animate();
-    
-    console.log("Three.js initialization complete!");
+    try {
+      // Scene setup
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0x87CEEB); // Sky blue background
+      
+      // Camera setup
+      this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      this.camera.position.set(0, 1.6, 5); // Positioning camera at human eye level
+      
+      // Renderer setup with error checking
+      try {
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+      } catch (error) {
+        console.error("WebGL renderer creation failed:", error);
+        alert("Failed to initialize WebGL. Please use a modern browser that supports WebGL.");
+        return false;
+      }
+      
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.shadowMap.enabled = true;
+      
+      // Get the container and add the renderer
+      const container = document.getElementById('game-container');
+      if (!container) {
+        console.error("Could not find game-container element!");
+        return false;
+      }
+      container.appendChild(this.renderer.domElement);
+      
+      // Controls setup
+      try {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
+        this.controls.maxPolarAngle = Math.PI / 2; // Prevent camera from going below ground
+      } catch (error) {
+        console.error("OrbitControls initialization failed:", error);
+        // We can continue without controls if necessary
+      }
+      
+      // Lighting setup
+      this.addLights();
+      
+      // Basic ground
+      this.addGround();
+      
+      // Scene assets loader
+      this.loader = new GLTFLoader();
+      
+      // Handle window resize
+      window.addEventListener('resize', () => this.onWindowResize(), false);
+      
+      // Animation loop
+      this.animate();
+      
+      console.log("Three.js initialization complete!");
+      return true;
+    } catch (error) {
+      console.error("Three.js initialization failed:", error);
+      return false;
+    }
   }
   
   initManagers() {
-    // Initialize UI manager
-    this.uiManager = new UIManager(this);
-    
-    // Initialize scenario manager
-    this.scenarioManager = new ScenarioManager(this);
-    this.scenarioManager.initializeScenarios();
-    
-    // Initialize interaction manager
-    this.interactionManager = new InteractionManager(this);
+    try {
+      // Initialize UI manager
+      this.uiManager = new UIManager(this);
+      
+      // Initialize scenario manager
+      this.scenarioManager = new ScenarioManager(this);
+      this.scenarioManager.initializeScenarios();
+      
+      // Initialize interaction manager
+      this.interactionManager = new InteractionManager(this);
+      
+      console.log("Game managers initialized successfully");
+    } catch (error) {
+      console.error("Failed to initialize game managers:", error);
+    }
   }
   
   initResources() {
@@ -296,8 +329,10 @@ class GlobalBusinessQuest {
   animate() {
     requestAnimationFrame(() => this.animate());
     
-    // Update controls
-    this.controls.update();
+    // Update controls if they exist
+    if (this.controls) {
+      this.controls.update();
+    }
     
     // Update active environment if it exists
     if (this.activeEnvironment && this.activeEnvironment.animate) {
@@ -559,244 +594,10 @@ class GlobalBusinessQuest {
 // Initialize the game when page loads
 window.addEventListener('DOMContentLoaded', () => {
   console.log("DOM fully loaded, initializing game...");
-  const game = new GlobalBusinessQuest();
+  try {
+    const game = new GlobalBusinessQuest();
+  } catch (error) {
+    console.error("Failed to initialize game:", error);
+    alert("Failed to initialize the game. See console for details.");
+  }
 });
-  addGround() {
-    const groundGeometry = new THREE.PlaneGeometry(100, 100);
-    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x1a5e1a });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.receiveShadow = true;
-    this.scene.add(ground);
-  }
-  
-  loadCountryScene(country) {
-    // Clear existing scene objects (except for lights and ground)
-    this.clearScene();
-    
-    // Reset interactive objects
-    this.interactiveObjects = [];
-    
-    // Load appropriate scene based on country
-    if (country === 'japan') {
-      this.activeEnvironment = new TokyoOfficeEnvironment(this.scene, this.loader);
-    } else if (country === 'france') {
-      this.activeEnvironment = new ParisRestaurantEnvironment(this.scene, this.loader);
-    }
-    
-    // Set up camera position
-    this.positionCameraForScene(country);
-  }
-  
-  positionCameraForScene(country) {
-    if (country === 'japan') {
-      this.camera.position.set(0, 1.6, 4);
-      this.camera.lookAt(0, 1.6, 0);
-    } else if (country === 'france') {
-      this.camera.position.set(0, 1.6, 4);
-      this.camera.lookAt(0, 1.6, 0);
-    }
-  }
-  
-  clearScene() {
-    // Keep track of permanent objects (lights, ground)
-    const permanentObjects = [];
-    this.scene.children.forEach(child => {
-      if (child instanceof THREE.AmbientLight || 
-          child instanceof THREE.DirectionalLight || 
-          (child instanceof THREE.Mesh && child.geometry instanceof THREE.PlaneGeometry)) {
-        permanentObjects.push(child);
-      }
-    });
-    
-    // Clear scene
-    this.scene.clear();
-    
-    // Add back permanent objects
-    permanentObjects.forEach(obj => this.scene.add(obj));
-  }
-  
-  onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
-    this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-  }
-  
-  animate() {
-    requestAnimationFrame(() => this.animate());
-    
-    // Update controls
-    this.controls.update();
-    
-    // Update active environment if it exists
-    if (this.activeEnvironment && this.activeEnvironment.update) {
-      this.activeEnvironment.update(performance.now());
-    }
-    
-    // Update interaction manager
-    if (this.interactionManager && this.interactionManager.update) {
-      this.interactionManager.update(performance.now());
-    }
-    
-    // Render scene
-    this.renderer.render(this.scene, this.camera);
-  }
-  
-  showCountrySelection() {
-    console.log("Showing country selection...");
-    
-    // Use UI manager to show country selection
-    this.uiManager.showCountrySelection();
-  }
-  
-  selectCountry(countryId) {
-    console.log("Country selected:", countryId);
-    this.currentCountry = countryId;
-    
-    // Load the country's 3D scene
-    this.loadCountryScene(countryId);
-    
-    // Show first scenario
-    const scenarios = this.countries[countryId].scenarios;
-    if (scenarios && scenarios.length > 0) {
-      this.startScenario(scenarios[0].id);
-    }
-  }
-  
-  startScenario(scenarioId) {
-    console.log("Starting scenario:", scenarioId);
-    
-    // Use scenario manager to start the scenario
-    this.scenarioManager.startScenario(scenarioId);
-    
-    // Get the scenario object
-    const scenario = this.scenarioManager.currentScenario;
-    
-    // Show scenario UI
-    this.uiManager.showScenario(scenario);
-    
-    // Show first interaction
-    this.nextInteraction();
-  }
-  
-  nextInteraction() {
-    // Get current interaction from scenario manager
-    const interaction = this.scenarioManager.getCurrentInteraction();
-    
-    if (interaction) {
-      // Show interaction in UI
-      this.uiManager.showInteraction(interaction);
-      
-      // Present interaction in the game world
-      this.interactionManager.presentInteraction(interaction);
-    } else {
-      // No more interactions, scenario complete
-      this.endScenario();
-    }
-  }
-  
-  selectOption(interaction, option) {
-    console.log("Option selected:", option.text);
-    
-    // Process selection with interaction manager
-    this.interactionManager.processSelection(option);
-    
-    // Show feedback
-    this.uiManager.showFeedback(option);
-    
-    // Update score
-    if (option.correct) {
-      this.playerScore += 10;
-      this.uiManager.updateScoreDisplay();
-    }
-    
-    // Move to next interaction after a delay
-    setTimeout(() => {
-      this.uiManager.hideFeedback();
-      this.scenarioManager.nextInteraction();
-      this.nextInteraction();
-    }, 3000);
-  }
-  
-  endScenario() {
-    console.log("Scenario complete");
-    
-    // Calculate score
-    const score = this.scenarioManager.currentScenario.calculateScore();
-    
-    // Update player's total score
-    this.playerScore = this.scenarioManager.getTotalScore();
-    
-    // Show scenario completion in UI
-    this.uiManager.showScenarioComplete(this.scenarioManager.currentScenario, score);
-  }
-  
-  // Event handlers for scenario and interaction events
-  onScenarioStart(scenario) {
-    console.log("Scenario started:", scenario.title);
-  }
-  
-  onInteractionStart(interaction) {
-    console.log("Interaction started:", interaction.id);
-  }
-  
-  onOptionSelected(interaction, option) {
-    console.log("Option selected in scenario:", option.text);
-    
-    // Record the player's choice in the scenario
-    this.scenarioManager.selectOption(option);
-  }
-  
-  onScenarioComplete(scenario, score) {
-    console.log("Scenario completed:", scenario.title, "Score:", score);
-  }
-  
-  // Camera movement
-  moveCamera(position, lookAt) {
-    // Animate camera to new position
-    const duration = 1000; // ms
-    const startPosition = this.camera.position.clone();
-    const startTime = performance.now();
-    
-    const animate = (time) => {
-      const elapsed = time - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      // Easing function for smooth movement
-      const easeProgress = progress < 0.5 
-        ? 2 * progress * progress 
-        : -1 + (4 - 2 * progress) * progress;
-      
-      // Update camera position
-      this.camera.position.lerpVectors(startPosition, position, easeProgress);
-      
-      // Look at the target
-      this.camera.lookAt(lookAt);
-      
-      // Continue animation if not complete
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-    
-    requestAnimationFrame(animate);
-  }
-  
-  // Track cultural knowledge gained
-  addCulturalKnowledge(country, key) {
-    if (!this.culturalCompetence[country]) {
-      this.culturalCompetence[country] = [];
-    }
-    
-    if (!this.culturalCompetence[country].includes(key)) {
-      this.culturalCompetence[country].push(key);
-      console.log("Cultural knowledge gained:", country, key);
-    }
-  }
-  
-  // Get player's cultural competence level for a country
-  getCulturalCompetenceLevel(country) {
-    if (!this.culturalCompetence[country]) return 0;
-    
-    return this.culturalCompetence[country].length;
-  }
