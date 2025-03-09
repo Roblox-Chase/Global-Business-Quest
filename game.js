@@ -8,9 +8,9 @@ if (!window.WebGLRenderingContext) {
 }
 
 // Import Three.js and necessary modules
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.174/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.174/examples/jsm/loaders/GLTFLoader.js';
 import { InteractionManager, enhancedInteractions, BaseEnvironment } from './interactions.js';
 import { ScenarioManager, additionalScenarios } from './scenarios.js';
 import { UIManager } from './ui.js';
