@@ -1,16 +1,10 @@
 // Global Business Quest - Three.js Implementation
 // This file sets up the core game environment and mechanics
 
-// Import Three.js and necessary modules from CDN
-import * as THREE from 'https://unpkg.com/three@0.174.0/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.174.0/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.174.0/examples/jsm/loaders/GLTFLoader.js';
-import { InteractionManager, enhancedInteractions } from './interactions.js';
-import { ScenarioManager, additionalScenarios } from './scenarios.js';
-import { UIManager } from './ui.js';
-import { TokyoOfficeEnvironment } from './countries/TokyoOfficeEnvironment.js';
-import { ParisRestaurantEnvironment } from './countries/ParisRestaurantEnvironment.js';
-import { textureManager } from './utils/textures.js';
+// Import Three.js and necessary modules
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
@@ -230,15 +224,6 @@ class GlobalBusinessQuest {
   loadJapanScene() {
     console.log("Loading Japan scene...");
     
-    // Example: Load Tokyo office environment
-    
-    // Create office building exterior
-    const buildingGeometry = new THREE.BoxGeometry(20, 30, 15);
-    const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0x888888 });
-    const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
-    building.position.set(0, 15, -20);
-    this.scene.add(building);
-    
     // Create office room
     const roomGeometry = new THREE.BoxGeometry(10, 5, 10);
     const roomMaterial = new THREE.MeshStandardMaterial({ 
@@ -260,15 +245,6 @@ class GlobalBusinessQuest {
   
   loadFranceScene() {
     console.log("Loading France scene...");
-    
-    // Example: Load Paris restaurant environment
-    
-    // Create restaurant exterior
-    const buildingGeometry = new THREE.BoxGeometry(15, 10, 15);
-    const buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xd2b48c });
-    const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
-    building.position.set(0, 5, -20);
-    this.scene.add(building);
     
     // Create restaurant interior
     const roomGeometry = new THREE.BoxGeometry(10, 5, 10);
