@@ -1,125 +1,156 @@
 # Global Business Quest
 
-## Overview
+## 🌍 About the Game
 
-Global Business Quest is an interactive educational game that teaches international business etiquette through engaging scenarios. This browser-based version uses Three.js to create immersive 3D environments where players navigate business situations in different countries and make culturally appropriate etiquette decisions.
+Global Business Quest is an interactive educational game designed to teach cultural competence in international business settings. Players navigate through realistic business scenarios in different countries, learning crucial cultural nuances and etiquette.
 
-## Features
+### 🎮 Game Concept
 
-- **Authentic Cultural Scenarios**: Learn real business customs from different countries
-- **Interactive Decision Points**: Test your cultural knowledge in realistic business situations
-- **Educational Feedback**: Receive immediate explanations about cultural practices
-- **Progression System**: Unlock new countries and scenarios as you demonstrate mastery
-- **3D Environments**: Experience business settings across different cultures
-- **No Installation Required**: Access directly through any modern web browser
+Explore business interactions in various countries, make culturally sensitive decisions, and build your global business skills. Currently featuring immersive experiences in:
+- 🇯🇵 Japan
+- 🇫🇷 France
 
-## Current Countries
+## ✨ Features
 
-- **Japan**: Navigate formal business meetings in Tokyo and learn proper business card etiquette, appropriate greetings, and meeting protocols
-- **France**: Master the art of business lunches in Paris, including proper dining etiquette, conversation topics, and timing for business discussions
+- Immersive 3D environments
+- Interactive business scenarios
+- Cultural competence scoring system
+- Mobile and desktop support
+- Detailed feedback on cultural interactions
 
-## Technical Architecture
+## 🚀 Getting Started
 
-This application is built with the following technologies:
+### Prerequisites
 
-- **Three.js**: Provides 3D rendering capabilities for immersive environments
-- **JavaScript (ES6+)**: Core programming language for game logic and interactions
-- **HTML5/CSS3**: Structure and styling for UI components
-- **Responsive Design**: Adapts to different screen sizes for desktop and mobile play
+- Modern web browser with WebGL support
+- JavaScript enabled
+- Recommended browsers:
+  - Chrome
+  - Firefox
+  - Safari
+  - Edge
 
-## How to Play
-
-1. Select a country to begin a business scenario
-2. Read each situation carefully and consider cultural context
-3. Choose the most appropriate response from the options provided
-4. Receive feedback on your choice and learn about the cultural reasoning
-5. Complete scenarios to earn Cultural Competence points
-6. Unlock new countries and scenarios as you progress
-
-## Development Setup
+### Installation
 
 1. Clone the repository
-```bash
-git clone https://github.com/Roblox-Chase/global-business-quest.git
-cd global-business-quest
-```
+   ```bash
+   git clone https://github.com/your-username/global-business-quest.git
+   ```
 
-2. Start a local server (using Python or Node.js)
-```bash
-# Python 3
-python -m http.server
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-# OR with Node.js
-npx serve
-```
+3. Run the game
+   ```bash
+   npm start
+   ```
 
-3. Open your browser at `http://localhost:8000` (or the port provided by your server)
+## 🎯 How to Play
 
-## Project Structure
+1. Select a Country
+   - Choose between Japan or France
+   - Each country offers a unique business scenario
+
+2. Navigate Scenarios
+   - Read the situation carefully
+   - Choose the most culturally appropriate response
+   - Learn from immediate feedback
+
+3. Earn Competence Points
+   - Correct decisions increase your cultural competence
+   - Unlock skills specific to each country
+   - Track your progress in the Competence Profile
+
+### Input Methods
+
+- 🖱️ Mouse Click (Primary)
+- 👆 Touch Interactions (Mobile)
+- Keyboard Navigation (Basic support)
+
+## 📊 Scoring System
+
+- Earn points for culturally appropriate choices
+- Track competence levels for each country
+- Unlock skills and titles as you progress
+
+## 🌐 Supported Platforms
+
+- Desktop Browsers
+- Mobile Devices (iOS, Android)
+- Responsive Design
+
+## 🛠️ Technical Details
+
+### Technologies Used
+- Three.js for 3D rendering
+- Vanilla JavaScript
+- Mobile-first design
+- WebGL
+
+### Performance Optimizations
+- Device-specific rendering
+- Mobile performance tweaks
+- Adaptive UI
+
+## 📂 Project Structure
 
 ```
 global-business-quest/
-├── index.html                                  # Entry point
-├── game.js                                     # Main game file
-├── styles.css                                  # CSS styles
-├── js/                                         # JS modules directory
-│   ├── scenarios.js                            # Scenario management
-│   ├── interactions.js                         # Interaction handling
-│   ├── ui.js                                   # UI components
-│   └── countries/                              # Country environments
-│       ├── TokyoOfficeEnvironment.js           # Japan environment
-│       └── ParisRestaurantEnvironment.js       # France environment
-│       └── textures.js                         # Texture management
-├── assets/                                     # Assets directory
-│   ├── images/                                 # Image files
-│   │   └── countries/                          # Country images
-│   │       ├── japan.jpg
-│   │       └── france.jpg
+│
+├── models/
+│   ├── paris-restaurant-environment-model.js
+│   └── tokyo-office-environment-model.js
+│
+├── countries/
+│   ├── FranceModule.js
+│   ├── JapanModule.js
+│   ├── parisrestaurantenvironment.js
+│   └── tokyoofficeenvironment.js
+│
+├── utils/
+│   └── textures.js
+│
+├── index.html
+├── README.md
+├── countries.js
+├── cultural-competence.js
+├── game.js
+├── interactions.js
+├── package.json
+├── scenario.js
+├── styles.css
+├── ui.js
+└── .nojekyll
 ```
 
-## Customization and Expansion
+### Key Files Explanation
 
-### Adding New Countries
+- `index.html`: Main entry point of the application
+- `game.js`: Core game logic and initialization
+- `ui.js`: User interface management
+- `countries.js`: Country-specific data and scenarios
+- `cultural-competence.js`: Competence tracking system
+- `interactions.js`: Interaction and scenario management
+- `styles.css`: Styling for the game
+- `models/`: 3D environment models
+- `countries/`: Country-specific modules and environments
+- `utils/`: Utility functions and resources
 
-To add a new country to the game:
+## 🔜 Planned Features
 
-1. Create a new country module in `js/countries/` following the pattern in existing files
-2. Design cultural scenarios with decision points and appropriate feedback
-3. Create 3D models and environments for the country's business settings
-4. Add the country to the main game configuration
+- More countries and scenarios
+- Enhanced skill system
+- Multilingual support
+- Expanded cultural interactions
 
-### Customizing Existing Content
+## 🎓 Learning Objectives
 
-Each country module contains:
-- Country metadata (name, description, difficulty)
-- Cultural scenarios with decision points
-- Business setting descriptions
-- Character interactions
-- Educational feedback for player choices
-
-These can be modified to update content or adjust difficulty levels.
-
-## Deployment
-
-The application can be deployed to any static web hosting service:
-
-1. **GitHub Pages**: Primary deployment for GBQ 
-2. **Vercel**: Acts an a secondary backup in case GitHub Pages is not working for primary deployment
-
-For production deployment, consider:
-- Minifying JavaScript and CSS files
-- Optimizing 3D models and textures
-- Implementing asset loading strategies for faster initial load
-
-## Future Development Roadmap
-
-Planned enhancements for future versions:
-
-1. **Additional Countries**: Germany, China, Brazil, India, and UAE
-2. **Advanced Scenarios**: Negotiation, conflict resolution, and team management
-3. **Multiplayer Mode**: Collaborate with other players in international business simulations
-4. **Custom Avatar Creation**: Personalize your business representative
-5. **Language Learning Elements**: Basic business phrases in each country's language
+- Develop cross-cultural communication skills
+- Understand international business etiquette
+- Improve cultural sensitivity
+- Enhance global business awareness
 
 ## Educational Applications
 
@@ -130,7 +161,7 @@ Global Business Quest is designed for:
 - **Individual Learners**: Self-paced education for entrepreneurs and professionals
 - **Cultural Studies**: Practical application of intercultural communication theories
 
-## Contact
+## 📞 Contact
 For questions, suggestions, or collaboration opportunities, please contact Chase:
 
 Email: robloxmanmail601@gmail.com
