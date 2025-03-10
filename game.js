@@ -29,10 +29,15 @@ class GlobalBusinessQuest {
         }
         
         // Initialize UI manager
-        this.uiManager = new UIManager(this);
-        
-        // Start the game by showing country selection
-        this.uiManager.showCountrySelection();
+        try {
+            this.uiManager = new UIManager(this);
+            
+            // Start the game by showing country selection
+            this.uiManager.showCountrySelection();
+        } catch (error) {
+            console.error("Failed to initialize UI manager:", error);
+            this.showErrorMessage("Failed to initialize UI: " + error.message);
+        }
     }
     
     initThreeJS() {
@@ -52,8 +57,7 @@ class GlobalBusinessQuest {
                 this.renderer = new THREE.WebGLRenderer({ antialias: true });
             } catch (error) {
                 console.error("WebGL renderer creation failed:", error);
-                document.getElementById('error-display').innerHTML = "Failed to initialize WebGL. Please use a modern browser that supports WebGL.";
-                document.getElementById('error-display').style.display = 'block';
+                this.showErrorMessage("Failed to initialize WebGL. Please use a modern browser that supports WebGL.");
                 return false;
             }
             
@@ -95,10 +99,32 @@ class GlobalBusinessQuest {
             return true;
         } catch (error) {
             console.error("Three.js initialization failed:", error);
-            document.getElementById('error-display').innerHTML = `Three.js initialization failed: ${error.message}`;
-            document.getElementById('error-display').style.display = 'block';
+            this.showErrorMessage(`Three.js initialization failed: ${error.message}`);
             return false;
         }
+    }
+    
+    showErrorMessage(message) {
+        // Create or get error display element
+        let errorDisplay = document.getElementById('error-display');
+        if (!errorDisplay) {
+            errorDisplay = document.createElement('div');
+            errorDisplay.id = 'error-display';
+            errorDisplay.style.position = 'fixed';
+            errorDisplay.style.top = '10px';
+            errorDisplay.style.left = '10px';
+            errorDisplay.style.right = '10px';
+            errorDisplay.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+            errorDisplay.style.color = 'white';
+            errorDisplay.style.padding = '15px';
+            errorDisplay.style.borderRadius = '5px';
+            errorDisplay.style.zIndex = '1000';
+            errorDisplay.style.textAlign = 'center';
+            document.body.appendChild(errorDisplay);
+        }
+        
+        errorDisplay.innerHTML = message;
+        errorDisplay.style.display = 'block';
     }
     
     addLights() {
@@ -131,32 +157,38 @@ class GlobalBusinessQuest {
     animate() {
         requestAnimationFrame(() => this.animate());
         
-        // Update controls if they exist
-        if (this.controls) {
-            this.controls.update();
+        try {
+            // Update controls if they exist
+            if (this.controls) {
+                this.controls.update();
+            }
+            
+            // Update active environment if it exists
+            if (this.activeEnvironment && this.activeEnvironment.animate) {
+                this.activeEnvironment.animate(performance.now());
+            }
+            
+            // Render scene
+            this.renderer.render(this.scene, this.camera);
+        } catch (error) {
+            console.error("Error in animation loop:", error);
+            // Don't show error to user since this would appear every frame
+            // Just log to console for debugging
         }
-        
-        // Update active environment if it exists
-        if (this.activeEnvironment && this.activeEnvironment.animate) {
-            this.activeEnvironment.animate(performance.now());
-        }
-        
-        // Render scene
-        this.renderer.render(this.scene, this.camera);
     }
     
     selectCountry(countryId) {
         console.log("Country selected:", countryId);
         this.currentCountry = countryId;
         
-        // Update scene background color
-        const country = this.countries[countryId];
-        if (country && country.color) {
-            this.scene.background = new THREE.Color(country.color);
-        }
-        
-        // Load the country environment
         try {
+            // Update scene background color
+            const country = this.countries[countryId];
+            if (country && country.color) {
+                this.scene.background = new THREE.Color(country.color);
+            }
+            
+            // Load the country environment
             this.activeEnvironment = createCountryEnvironment(this.scene, countryId);
             
             // Position camera appropriately
@@ -167,8 +199,7 @@ class GlobalBusinessQuest {
             this.startScenario(country.scenarios[0]);
         } catch (error) {
             console.error("Error creating country environment:", error);
-            document.getElementById('error-display').innerHTML = `Error creating environment: ${error.message}`;
-            document.getElementById('error-display').style.display = 'block';
+            this.showErrorMessage(`Error creating environment: ${error.message}`);
         }
     }
     
@@ -176,51 +207,80 @@ class GlobalBusinessQuest {
         console.log("Starting scenario:", scenario.title);
         this.currentScenario = scenario;
         
-        // Show scenario in UI
-        this.uiManager.showScenario(scenario);
-        
-        // Start with the first interaction
-        this.currentInteractionIndex = 0;
-        this.nextInteraction();
+        try {
+            // Show scenario in UI
+            this.uiManager.showScenario(scenario);
+            
+            // Start with the first interaction
+            this.currentInteractionIndex = 0;
+            this.nextInteraction();
+        } catch (error) {
+            console.error("Error starting scenario:", error);
+            this.showErrorMessage(`Error starting scenario: ${error.message}`);
+        }
     }
     
     nextInteraction() {
-        // Check if we have more interactions
-        if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
-            const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
-            this.currentInteraction = interaction;
-            
-            // Show interaction in UI
-            this.uiManager.showInteraction(interaction);
-        } else {
-            // End of scenario
-            this.endScenario();
+        try {
+            // Check if we have more interactions
+            if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
+                const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
+                this.currentInteraction = interaction;
+                
+                // Show interaction in UI
+                this.uiManager.showInteraction(interaction);
+            } else {
+                // End of scenario
+                this.endScenario();
+            }
+        } catch (error) {
+            console.error("Error loading next interaction:", error);
+            this.showErrorMessage(`Error loading next interaction: ${error.message}`);
         }
     }
     
     selectOption(interaction, option) {
         console.log("Option selected:", option.text);
         
-        // Show feedback
-        this.uiManager.showFeedback(option);
-        
-        // Update score if correct
-        if (option.correct) {
-            this.playerScore += 10;
-            this.uiManager.updateScoreDisplay(this.playerScore);
+        try {
+            // Show feedback
+            this.uiManager.showFeedback(option);
+            
+            // Update score if correct
+            if (option.correct) {
+                this.playerScore += 10;
+                this.uiManager.updateScoreDisplay(this.playerScore);
+            }
+            
+            // Move to next interaction after a delay
+            this.currentInteractionIndex++;
+            
+            // Automatically advance to next question after a delay
+            setTimeout(() => {
+                this.uiManager.hideFeedback();
+                this.nextInteraction();
+            }, 3000); // 3 second delay to read feedback
+        } catch (error) {
+            console.error("Error processing option selection:", error);
+            this.showErrorMessage(`Error processing selection: ${error.message}`);
         }
-        
-        // Move to next interaction
-        this.currentInteractionIndex++;
     }
     
     endScenario() {
         console.log("Scenario complete");
         
-        // For now, just go back to country selection
-        setTimeout(() => {
-            this.uiManager.showCountrySelection();
-        }, 1000);
+        try {
+            // Show scenario completion screen
+            this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+        } catch (error) {
+            console.error("Error ending scenario:", error);
+            this.showErrorMessage(`Error completing scenario: ${error.message}`);
+            
+            // Fallback to country selection
+            setTimeout(() => {
+                this.uiManager.showCountrySelection();
+            }, 1000);
+        }
     }
 }
 
@@ -231,7 +291,26 @@ window.addEventListener('DOMContentLoaded', () => {
         const game = new GlobalBusinessQuest();
     } catch (error) {
         console.error("Failed to initialize game:", error);
-        document.getElementById('error-display').innerHTML = `Failed to initialize game: ${error.message}`;
-        document.getElementById('error-display').style.display = 'block';
+        
+        // Create error display if it doesn't exist
+        let errorDisplay = document.getElementById('error-display');
+        if (!errorDisplay) {
+            errorDisplay = document.createElement('div');
+            errorDisplay.id = 'error-display';
+            errorDisplay.style.position = 'fixed';
+            errorDisplay.style.top = '10px';
+            errorDisplay.style.left = '10px';
+            errorDisplay.style.right = '10px';
+            errorDisplay.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+            errorDisplay.style.color = 'white';
+            errorDisplay.style.padding = '15px';
+            errorDisplay.style.borderRadius = '5px';
+            errorDisplay.style.zIndex = '1000';
+            errorDisplay.style.textAlign = 'center';
+            document.body.appendChild(errorDisplay);
+        }
+        
+        errorDisplay.innerHTML = `Failed to initialize game: ${error.message}`;
+        errorDisplay.style.display = 'block';
     }
 });
