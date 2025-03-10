@@ -177,6 +177,7 @@ export class UIManager {
             
             const countryButton = document.createElement('div');
             countryButton.classList.add('country-button');
+            countryButton.dataset.countryId = countryId; // Add country ID as data attribute
             
             // Create container for better layout
             const buttonContent = document.createElement('div');
@@ -210,14 +211,6 @@ export class UIManager {
             buttonContent.appendChild(countryInfo);
             countryButton.appendChild(buttonContent);
             
-            // Add cultural competence level if player has a score
-            if (this.game.playerScore > 0) {
-                const competenceBadge = document.createElement('div');
-                competenceBadge.className = 'competence-badge';
-                competenceBadge.textContent = `Score: ${this.game.playerScore}`;
-                countryButton.appendChild(competenceBadge);
-            }
-            
             // Use touchend for faster response on mobile
             if (this.isMobile) {
                 let touchStarted = false;
@@ -246,6 +239,9 @@ export class UIManager {
             
             this.countrySelectionUI.appendChild(countryButton);
         });
+        
+        // Add competence information to country buttons
+        this.updateCountrySelectionWithCompetence();
         
         // Show country selection and hide other UIs
         this.countrySelectionUI.style.display = 'block';
@@ -420,6 +416,247 @@ export class UIManager {
         }, 500);
     }
     
+    // CULTURAL COMPETENCE SYSTEM METHODS
+    
+    // Show a competence profile screen with all skills and levels
+    showCompetenceProfile() {
+        // Clear previous content
+        this.countrySelectionUI.innerHTML = '';
+        
+        // Add title
+        const title = document.createElement('h2');
+        title.textContent = 'Cultural Competence Profile';
+        this.countrySelectionUI.appendChild(title);
+        
+        // Add description
+        const description = document.createElement('p');
+        description.textContent = 'Track your cultural business knowledge across different countries.';
+        this.countrySelectionUI.appendChild(description);
+        
+        // Add total score
+        const totalScore = document.createElement('div');
+        totalScore.className = 'total-competence-score';
+        totalScore.innerHTML = `<h3>Total Competence: ${this.game.competenceSystem.getTotalCompetence()} points</h3>`;
+        this.countrySelectionUI.appendChild(totalScore);
+        
+        // Create country tabs for each country
+        const tabsContainer = document.createElement('div');
+        tabsContainer.className = 'country-tabs';
+        
+        const countriesContainer = document.createElement('div');
+        countriesContainer.className = 'countries-container';
+        
+        // For each country, create a tab and content section
+        Object.keys(this.game.competenceSystem.competenceLevels).forEach((countryId, index) => {
+            const country = this.game.countries[countryId];
+            
+            // Create tab
+            const tab = document.createElement('button');
+            tab.className = 'country-tab' + (index === 0 ? ' active' : '');
+            tab.textContent = country.name;
+            tab.dataset.countryId = countryId;
+            tab.addEventListener('click', (e) => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.country-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                e.target.classList.add('active');
+                // Hide all content panels
+                document.querySelectorAll('.country-competence-panel').forEach(p => p.style.display = 'none');
+                // Show the selected panel
+                document.getElementById(`competence-panel-${countryId}`).style.display = 'block';
+            });
+            tabsContainer.appendChild(tab);
+            
+            // Create content panel
+            const panel = document.createElement('div');
+            panel.id = `competence-panel-${countryId}`;
+            panel.className = 'country-competence-panel';
+            panel.style.display = index === 0 ? 'block' : 'none';
+            
+            // Country competence info
+            const countryInfo = this.game.competenceSystem.getCompetenceSummary().countries[countryId];
+            
+            // Add competence level and title
+            const levelInfo = document.createElement('div');
+            levelInfo.className = 'competence-level-info';
+            levelInfo.innerHTML = `
+                <h3>${country.name} - ${countryInfo.title}</h3>
+                <div class="competence-progress">
+                    <div class="competence-bar">
+                        <div class="competence-fill" style="width: ${Math.min(100, countryInfo.points)}%"></div>
+                    </div>
+                    <span>${countryInfo.points} points</span>
+                </div>
+            `;
+            panel.appendChild(levelInfo);
+            
+            // Add skills section
+            const skillsSection = document.createElement('div');
+            skillsSection.className = 'skills-section';
+            
+            const skillsTitle = document.createElement('h4');
+            skillsTitle.textContent = 'Cultural Skills';
+            skillsSection.appendChild(skillsTitle);
+            
+            if (countryInfo.skills.length > 0) {
+                const skillsList = document.createElement('div');
+                skillsList.className = 'skills-list';
+                
+                countryInfo.skills.forEach(skill => {
+                    const skillItem = document.createElement('div');
+                    skillItem.className = 'skill-item';
+                    skillItem.innerHTML = `
+                        <div class="skill-icon ${countryId}-${skill.id}"></div>
+                        <div class="skill-details">
+                            <h5>${skill.name}</h5>
+                            <p>${skill.description}</p>
+                        </div>
+                    `;
+                    skillsList.appendChild(skillItem);
+                });
+                
+                skillsSection.appendChild(skillsList);
+            } else {
+                const noSkills = document.createElement('p');
+                noSkills.className = 'no-skills';
+                noSkills.textContent = 'No cultural skills unlocked yet. Complete scenarios to earn skills!';
+                skillsSection.appendChild(noSkills);
+            }
+            
+            // Add next skill to unlock (if any)
+            if (countryInfo.nextSkill) {
+                const nextSkillSection = document.createElement('div');
+                nextSkillSection.className = 'next-skill-section';
+                
+                const nextSkillTitle = document.createElement('h4');
+                nextSkillTitle.textContent = 'Next Skill to Unlock';
+                nextSkillSection.appendChild(nextSkillTitle);
+                
+                const nextSkillItem = document.createElement('div');
+                nextSkillItem.className = 'skill-item locked';
+                nextSkillItem.innerHTML = `
+                    <div class="skill-icon locked ${countryId}-${countryInfo.nextSkill.id}"></div>
+                    <div class="skill-details">
+                        <h5>${countryInfo.nextSkill.name}</h5>
+                        <p>${countryInfo.nextSkill.description}</p>
+                    </div>
+                `;
+                nextSkillSection.appendChild(nextSkillItem);
+                
+                skillsSection.appendChild(nextSkillSection);
+            }
+            
+            panel.appendChild(skillsSection);
+            countriesContainer.appendChild(panel);
+        });
+        
+        // Add tabs and panels to container
+        this.countrySelectionUI.appendChild(tabsContainer);
+        this.countrySelectionUI.appendChild(countriesContainer);
+        
+        // Add return button
+        const returnButton = document.createElement('button');
+        returnButton.textContent = 'Return to Country Selection';
+        returnButton.className = 'return-button';
+        returnButton.addEventListener('click', () => {
+            this.showCountrySelection();
+        });
+        this.countrySelectionUI.appendChild(returnButton);
+        
+        // Show the main container and hide others
+        this.countrySelectionUI.style.display = 'block';
+        this.scenarioUI.style.display = 'none';
+        this.feedbackUI.style.display = 'none';
+    }
+    
+    // Update the country selection UI to show competence levels
+    updateCountrySelectionWithCompetence() {
+        // Find all country buttons
+        const countryButtons = this.countrySelectionUI.querySelectorAll('.country-button');
+        
+        countryButtons.forEach(button => {
+            // Get the country ID from the button
+            const countryId = button.dataset.countryId;
+            if (!countryId) return;
+            
+            // Remove any existing competence badge
+            const existingBadge = button.querySelector('.competence-badge');
+            if (existingBadge) {
+                existingBadge.remove();
+            }
+            
+            // Get competence level and title
+            const points = this.game.competenceSystem.getCompetenceLevel(countryId);
+            const title = this.game.competenceSystem.getCompetenceTitle(countryId);
+            
+            if (points > 0) {
+                // Create competence badge
+                const competenceBadge = document.createElement('div');
+                competenceBadge.className = 'competence-badge';
+                competenceBadge.innerHTML = `${title}: ${points} points`;
+                button.appendChild(competenceBadge);
+            }
+        });
+        
+        // Add profile button if not already present
+        if (!document.getElementById('profile-button')) {
+            const profileButton = document.createElement('button');
+            profileButton.id = 'profile-button';
+            profileButton.className = 'profile-button';
+            profileButton.textContent = 'View Competence Profile';
+            profileButton.addEventListener('click', () => {
+                this.showCompetenceProfile();
+            });
+            this.countrySelectionUI.appendChild(profileButton);
+        }
+    }
+    
+    // Show a skill unlock notification
+    showSkillUnlockNotification(countryId, skillId, skillName, skillDescription) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'skill-unlock-notification';
+        
+        notification.innerHTML = `
+            <h3>New Cultural Skill Unlocked!</h3>
+            <div class="skill-icon ${countryId}-${skillId}"></div>
+            <div class="skill-details">
+                <h4>${skillName}</h4>
+                <p>${skillDescription}</p>
+            </div>
+            <button class="notification-close">Continue</button>
+        `;
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Show with animation
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Handle close button
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto close after 8 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 8000);
+    }
+    
+    // Updated showScenarioComplete to include competence information
     showScenarioComplete(countryId, score) {
         // Clear existing content
         this.feedbackUI.innerHTML = '';
@@ -439,6 +676,28 @@ export class UIManager {
         scoreMsg.textContent = `You earned ${score} points in ${this.game.countries[countryId].name}!`;
         completionContainer.appendChild(scoreMsg);
         
+        // Add competence update (new)
+        const competenceUpdate = document.createElement('div');
+        competenceUpdate.className = 'competence-update';
+        
+        // Get previous and new competence level
+        const prevLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
+        
+        // Award competence points equal to scenario score
+        this.game.competenceSystem.addCompetencePoints(countryId, score);
+        
+        // Get new level and title
+        const newLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
+        const title = this.game.competenceSystem.getCompetenceTitle(countryId);
+        
+        competenceUpdate.innerHTML = `
+            <h4>Cultural Competence Updated</h4>
+            <p>${this.game.countries[countryId].name} Competence: ${prevLevel} → ${newLevel} points</p>
+            <p>Current Title: ${title}</p>
+        `;
+        
+        completionContainer.appendChild(competenceUpdate);
+        
         // Add cultural insight
         const insightMsg = document.createElement('p');
         insightMsg.className = 'cultural-insight';
@@ -453,6 +712,10 @@ export class UIManager {
         }
         
         completionContainer.appendChild(insightMsg);
+        
+        // Add button container for multiple buttons
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
         
         // Add return button
         const returnButton = document.createElement('button');
@@ -495,7 +758,22 @@ export class UIManager {
             });
         }
         
-        completionContainer.appendChild(returnButton);
+        // Add a "View Profile" button (new)
+        const profileButton = document.createElement('button');
+        profileButton.textContent = 'View Competence Profile';
+        profileButton.className = 'continue-button profile-button';
+        
+        // Adjust button size for mobile devices
+        this.adjustButtonSizeForDevice(profileButton);
+        
+        profileButton.addEventListener('click', () => {
+            this.showCompetenceProfile();
+        });
+        
+        // Add buttons to container
+        buttonContainer.appendChild(returnButton);
+        buttonContainer.appendChild(profileButton);
+        completionContainer.appendChild(buttonContainer);
         
         // Add the completion container to the feedback UI
         this.feedbackUI.appendChild(completionContainer);
