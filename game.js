@@ -8,6 +8,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // Import game modules
 import { countries, createCountryEnvironment } from './countries.js';
 import { UIManager } from './ui.js';
+// Import Cultural Competence System
+import { CulturalCompetenceSystem } from './cultural-competence.js';
 
 // Main Game Class
 class GlobalBusinessQuest {
@@ -21,6 +23,20 @@ class GlobalBusinessQuest {
         this.playerScore = 0;
         this.countries = countries;
         this.activeEnvironment = null;
+        
+        // Initialize Cultural Competence System
+        this.competenceSystem = new CulturalCompetenceSystem();
+        
+        // Add listener for skill unlock events
+        document.addEventListener('culturalSkillUnlocked', (event) => {
+            // Show notification for new skill
+            this.uiManager.showSkillUnlockNotification(
+                event.detail.countryId,
+                event.detail.skillId,
+                event.detail.skillName,
+                event.detail.skillDescription
+            );
+        });
         
         // Detect if mobile device
         this.isMobile = this.detectMobile();
@@ -50,6 +66,48 @@ class GlobalBusinessQuest {
                 setTimeout(() => this.onWindowResize(), 200); // Delay to allow browser to update dimensions
             });
         }
+    }
+    
+    // Cultural Competence System Methods
+    
+    // Method to award competence points based on scenario performance
+    awardCompetencePoints(countryId, points) {
+        if (this.competenceSystem) {
+            return this.competenceSystem.addCompetencePoints(countryId, points);
+        }
+        return false;
+    }
+    
+    // Method to get competence level for a country
+    getCompetenceLevel(countryId) {
+        if (this.competenceSystem) {
+            return this.competenceSystem.getCompetenceLevel(countryId);
+        }
+        return 0;
+    }
+    
+    // Method to get competence title for a country
+    getCompetenceTitle(countryId) {
+        if (this.competenceSystem) {
+            return this.competenceSystem.getCompetenceTitle(countryId);
+        }
+        return "Novice";
+    }
+    
+    // Method to get all competence data
+    getCompetenceSummary() {
+        if (this.competenceSystem) {
+            return this.competenceSystem.getCompetenceSummary();
+        }
+        return null;
+    }
+    
+    // Method to reset all competence data (for testing)
+    resetCompetenceProgress() {
+        if (this.competenceSystem) {
+            return this.competenceSystem.resetProgress();
+        }
+        return false;
     }
     
     detectMobile() {
@@ -337,6 +395,12 @@ class GlobalBusinessQuest {
             if (option.correct) {
                 this.playerScore += 10;
                 this.uiManager.updateScoreDisplay(this.playerScore);
+                
+                // Check if this question/option relates to a specific cultural skill
+                if (interaction.skillId && this.currentCountry) {
+                    // Mark relevant interactions for skill acquisition
+                    console.log(`This interaction relates to the ${interaction.skillId} skill in ${this.currentCountry}`);
+                }
             }
             
             // Move to next interaction after a delay
@@ -360,14 +424,15 @@ class GlobalBusinessQuest {
         console.log("Scenario complete");
         
         try {
-            // Show scenario completion screen
-            this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
-            
             // On mobile, simplify the 3D scene when showing completion to improve performance
             if (this.isMobile && this.activeEnvironment) {
                 // Reduce animation complexity or stop non-essential animations
                 this.simplifyScene();
             }
+            
+            // Show scenario completion screen with cultural competence update
+            this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+            
         } catch (error) {
             console.error("Error ending scenario:", error);
             this.showErrorMessage(`Error completing scenario: ${error.message}`);
