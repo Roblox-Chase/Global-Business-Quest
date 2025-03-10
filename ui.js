@@ -41,6 +41,45 @@ export class UIManager {
         }
     }
     
+    // Helper method to check if competence system is initialized
+    hasCompetenceSystem() {
+        return this.game && this.game.competenceSystem;
+    }
+    
+    // Helper method to show error message
+    showErrorMessage(message) {
+        // Create or get error display element
+        let errorDisplay = document.getElementById('error-display');
+        if (!errorDisplay) {
+            errorDisplay = document.createElement('div');
+            errorDisplay.id = 'error-display';
+            errorDisplay.style.position = 'fixed';
+            errorDisplay.style.top = '10px';
+            errorDisplay.style.left = '10px';
+            errorDisplay.style.right = '10px';
+            errorDisplay.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+            errorDisplay.style.color = 'white';
+            errorDisplay.style.padding = '15px';
+            errorDisplay.style.borderRadius = '5px';
+            errorDisplay.style.zIndex = '1000';
+            errorDisplay.style.textAlign = 'center';
+            document.body.appendChild(errorDisplay);
+        }
+        
+        errorDisplay.innerHTML = message;
+        errorDisplay.style.display = 'block';
+        
+        // Auto-hide after 7 seconds
+        setTimeout(() => {
+            errorDisplay.style.opacity = '0';
+            errorDisplay.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                errorDisplay.style.display = 'none';
+                errorDisplay.style.opacity = '1';
+            }, 500);
+        }, 7000);
+    }
+    
     detectMobile() {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
             || (window.innerWidth <= 768);
@@ -240,8 +279,10 @@ export class UIManager {
             this.countrySelectionUI.appendChild(countryButton);
         });
         
-        // Add competence information to country buttons
-        this.updateCountrySelectionWithCompetence();
+        // Add competence information to country buttons if competence system exists
+        if (this.hasCompetenceSystem()) {
+            this.updateCountrySelectionWithCompetence();
+        }
         
         // Show country selection and hide other UIs
         this.countrySelectionUI.style.display = 'block';
@@ -420,6 +461,13 @@ export class UIManager {
     
     // Show a competence profile screen with all skills and levels
     showCompetenceProfile() {
+        // Check if competence system is initialized
+        if (!this.hasCompetenceSystem()) {
+            console.log("Competence system not yet initialized");
+            this.showErrorMessage("The competence system is still loading. Please try again.");
+            return;
+        }
+        
         // Clear previous content
         this.countrySelectionUI.innerHTML = '';
         
@@ -571,6 +619,12 @@ export class UIManager {
     
     // Update the country selection UI to show competence levels
     updateCountrySelectionWithCompetence() {
+        // Check if competence system exists
+        if (!this.hasCompetenceSystem()) {
+            console.log("Competence system not yet initialized");
+            return;
+        }
+        
         // Find all country buttons
         const countryButtons = this.countrySelectionUI.querySelectorAll('.country-button');
         
@@ -598,8 +652,8 @@ export class UIManager {
             }
         });
         
-        // Add profile button if not already present
-        if (!document.getElementById('profile-button')) {
+        // Add profile button if competence system exists and button not already present
+        if (this.hasCompetenceSystem() && !document.getElementById('profile-button')) {
             const profileButton = document.createElement('button');
             profileButton.id = 'profile-button';
             profileButton.className = 'profile-button';
@@ -676,27 +730,29 @@ export class UIManager {
         scoreMsg.textContent = `You earned ${score} points in ${this.game.countries[countryId].name}!`;
         completionContainer.appendChild(scoreMsg);
         
-        // Add competence update (new)
-        const competenceUpdate = document.createElement('div');
-        competenceUpdate.className = 'competence-update';
-        
-        // Get previous and new competence level
-        const prevLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
-        
-        // Award competence points equal to scenario score
-        this.game.competenceSystem.addCompetencePoints(countryId, score);
-        
-        // Get new level and title
-        const newLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
-        const title = this.game.competenceSystem.getCompetenceTitle(countryId);
-        
-        competenceUpdate.innerHTML = `
-            <h4>Cultural Competence Updated</h4>
-            <p>${this.game.countries[countryId].name} Competence: ${prevLevel} → ${newLevel} points</p>
-            <p>Current Title: ${title}</p>
-        `;
-        
-        completionContainer.appendChild(competenceUpdate);
+        // Add competence update if system is initialized
+        if (this.hasCompetenceSystem()) {
+            const competenceUpdate = document.createElement('div');
+            competenceUpdate.className = 'competence-update';
+            
+            // Get previous and new competence level
+            const prevLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
+            
+            // Award competence points equal to scenario score
+            this.game.competenceSystem.addCompetencePoints(countryId, score);
+            
+            // Get new level and title
+            const newLevel = this.game.competenceSystem.getCompetenceLevel(countryId);
+            const title = this.game.competenceSystem.getCompetenceTitle(countryId);
+            
+            competenceUpdate.innerHTML = `
+                <h4>Cultural Competence Updated</h4>
+                <p>${this.game.countries[countryId].name} Competence: ${prevLevel} → ${newLevel} points</p>
+                <p>Current Title: ${title}</p>
+            `;
+            
+            completionContainer.appendChild(competenceUpdate);
+        }
         
         // Add cultural insight
         const insightMsg = document.createElement('p');
@@ -758,35 +814,274 @@ export class UIManager {
             });
         }
         
-        // Add a "View Profile" button (new)
-        const profileButton = document.createElement('button');
-        profileButton.textContent = 'View Competence Profile';
-        profileButton.className = 'continue-button profile-button';
-        
-        // Adjust button size for mobile devices
-        this.adjustButtonSizeForDevice(profileButton);
-        
-        profileButton.addEventListener('click', () => {
-            this.showCompetenceProfile();
-        });
-        
-        // Add buttons to container
         buttonContainer.appendChild(returnButton);
-        buttonContainer.appendChild(profileButton);
-        completionContainer.appendChild(buttonContainer);
         
-        // Add the completion container to the feedback UI
+        // Add view profile button if competence system exists
+        if (this.hasCompetenceSystem()) {
+            const profileButton = document.createElement('button');
+            profileButton.textContent = 'View Competence Profile';
+            profileButton.className = 'profile-button';
+            
+            // Adjust button size for mobile devices
+            this.adjustButtonSizeForDevice(profileButton);
+            
+            // Use touchend for faster response on mobile
+            if (this.isMobile) {
+                let touchStarted = false;
+                
+                profileButton.addEventListener('touchstart', () => {
+                    touchStarted = true;
+                    profileButton.classList.add('active');
+                }, { passive: true });
+                
+                profileButton.addEventListener('touchend', (e) => {
+                    profileButton.classList.remove('active');
+                    if (touchStarted) {
+                        e.preventDefault();
+                        this.showCompetenceProfile();
+                    }
+                    touchStarted = false;
+                });
+                
+                profileButton.addEventListener('touchcancel', () => {
+                    profileButton.classList.remove('active');
+                    touchStarted = false;
+                });
+                
+                // Keep click for desktop fallback
+                profileButton.addEventListener('click', () => {
+                    this.showCompetenceProfile();
+                });
+            } else {
+                profileButton.addEventListener('click', () => {
+                    this.showCompetenceProfile();
+                });
+            }
+            
+            buttonContainer.appendChild(profileButton);
+        }
+        
+        completionContainer.appendChild(buttonContainer);
         this.feedbackUI.appendChild(completionContainer);
         
-        // Hide scenario UI and show feedback UI
+        // Hide scenario UI and show feedback UI with animation
         this.scenarioUI.style.display = 'none';
         this.feedbackUI.style.display = 'block';
+        this.feedbackUI.classList.add('fade-in');
         
-        // On mobile, make sure completion screen is visible
+        // On mobile, make sure feedback is visible
         if (this.isMobile) {
             setTimeout(() => {
-                this.feedbackUI.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                this.feedbackUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
+        
+        setTimeout(() => {
+            this.feedbackUI.classList.remove('fade-in');
+        }, 500);
+        
+        // Update score display
+        if (this.hasCompetenceSystem()) {
+            this.updateScoreDisplay(this.game.competenceSystem.getTotalCompetence());
+        }
+    }
+    
+    // Show a level up notification
+    showLevelUpNotification(countryId, newTitle) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'level-up-notification';
+        
+        notification.innerHTML = `
+            <h3>Cultural Level Up!</h3>
+            <p>Your understanding of ${this.game.countries[countryId].name} business culture has improved!</p>
+            <p>New Title: <strong>${newTitle}</strong></p>
+            <button class="notification-close">Continue</button>
+        `;
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Show with animation
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Handle close button
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto close after 8 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 8000);
+    }
+    
+    // Show game complete screen
+    showGameComplete() {
+        // Clear existing content
+        this.feedbackUI.innerHTML = '';
+        
+        // Create a container for the completion content with animation
+        const completionContainer = document.createElement('div');
+        completionContainer.className = 'game-complete';
+        
+        // Add congratulations header
+        const congratsHeader = document.createElement('h2');
+        congratsHeader.textContent = 'Congratulations!';
+        congratsHeader.style.color = '#28a745';
+        completionContainer.appendChild(congratsHeader);
+        
+        // Add completion message
+        const completionMsg = document.createElement('p');
+        completionMsg.textContent = 'You have completed Global Business Quest!';
+        completionContainer.appendChild(completionMsg);
+        
+        // Add total score if competence system exists
+        if (this.hasCompetenceSystem()) {
+            const totalScore = this.game.competenceSystem.getTotalCompetence();
+            const scoreElement = document.createElement('div');
+            scoreElement.className = 'final-score';
+            scoreElement.innerHTML = `
+                <h3>Total Cultural Competence: ${totalScore} points</h3>
+            `;
+            completionContainer.appendChild(scoreElement);
+            
+            // Add country breakdown
+            const countryBreakdown = document.createElement('div');
+            countryBreakdown.className = 'country-breakdown';
+            
+            const breakdownTitle = document.createElement('h4');
+            breakdownTitle.textContent = 'Country Competence Breakdown:';
+            countryBreakdown.appendChild(breakdownTitle);
+            
+            const countryList = document.createElement('ul');
+            
+            Object.keys(this.game.countries).forEach(countryId => {
+                const country = this.game.countries[countryId];
+                const points = this.game.competenceSystem.getCompetenceLevel(countryId);
+                const title = this.game.competenceSystem.getCompetenceTitle(countryId);
+                
+                const countryItem = document.createElement('li');
+                countryItem.innerHTML = `<strong>${country.name}:</strong> ${points} points (${title})`;
+                countryList.appendChild(countryItem);
+            });
+            
+            countryBreakdown.appendChild(countryList);
+            completionContainer.appendChild(countryBreakdown);
+        }
+        
+        // Add achievement message based on competence
+        if (this.hasCompetenceSystem()) {
+            const totalScore = this.game.competenceSystem.getTotalCompetence();
+            const achievementMsg = document.createElement('p');
+            achievementMsg.className = 'achievement-message';
+            
+            if (totalScore >= 100) {
+                achievementMsg.textContent = 'You have demonstrated exceptional cultural business competence! You are ready for an international business career.';
+            } else if (totalScore >= 75) {
+                achievementMsg.textContent = 'You have shown strong cultural business awareness! With a little more practice, you\'ll be an international business expert.';
+            } else if (totalScore >= 50) {
+                achievementMsg.textContent = 'You have developed good cultural business understanding. Keep learning to improve your global business skills!';
+            } else {
+                achievementMsg.textContent = 'You\'ve taken your first steps into global business awareness. Keep exploring cultural differences to build your competence!';
+            }
+            
+            completionContainer.appendChild(achievementMsg);
+        }
+        
+        // Add tips for improvement
+        const tipsSection = document.createElement('div');
+        tipsSection.className = 'tips-section';
+        
+        const tipsTitle = document.createElement('h4');
+        tipsTitle.textContent = 'Tips for Global Business Success:';
+        tipsSection.appendChild(tipsTitle);
+        
+        const tipsList = document.createElement('ul');
+        tipsList.innerHTML = `
+            <li>Research cultural norms before visiting a new country</li>
+            <li>Show respect for local customs and traditions</li>
+            <li>Learn basic greetings in the local language</li>
+            <li>Understand business etiquette differences</li>
+            <li>Be patient and flexible in cross-cultural situations</li>
+        `;
+        
+        tipsSection.appendChild(tipsList);
+        completionContainer.appendChild(tipsSection);
+        
+        // Add restart button
+        const restartButton = document.createElement('button');
+        restartButton.textContent = 'Restart Game';
+        restartButton.className = 'restart-button';
+        
+        // Adjust button size for mobile devices
+        this.adjustButtonSizeForDevice(restartButton);
+        
+        // Use touchend for faster response on mobile
+        if (this.isMobile) {
+            let touchStarted = false;
+            
+            restartButton.addEventListener('touchstart', () => {
+                touchStarted = true;
+                restartButton.classList.add('active');
+            }, { passive: true });
+            
+            restartButton.addEventListener('touchend', (e) => {
+                restartButton.classList.remove('active');
+                if (touchStarted) {
+                    e.preventDefault();
+                    this.game.reset();
+                    this.showCountrySelection();
+                }
+                touchStarted = false;
+            });
+            
+            restartButton.addEventListener('touchcancel', () => {
+                restartButton.classList.remove('active');
+                touchStarted = false;
+            });
+            
+            // Keep click for desktop fallback
+            restartButton.addEventListener('click', () => {
+                this.game.reset();
+                this.showCountrySelection();
+            });
+        } else {
+            restartButton.addEventListener('click', () => {
+                this.game.reset();
+                this.showCountrySelection();
+            });
+        }
+        
+        completionContainer.appendChild(restartButton);
+        this.feedbackUI.appendChild(completionContainer);
+        
+        // Hide scenario UI and show feedback UI with animation
+        this.scenarioUI.style.display = 'none';
+        this.feedbackUI.style.display = 'block';
+        this.feedbackUI.classList.add('fade-in');
+        
+        // On mobile, make sure feedback is visible
+        if (this.isMobile) {
+            setTimeout(() => {
+                this.feedbackUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+        
+        setTimeout(() => {
+            this.feedbackUI.classList.remove('fade-in');
+        }, 500);
     }
 }
