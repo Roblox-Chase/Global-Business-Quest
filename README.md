@@ -165,4 +165,4 @@ Global Business Quest is designed for:
 For questions, suggestions, or collaboration opportunities, please contact Chase:
 
 Email: robloxmanmail601@gmail.com
-Project repo: github.com/roblox-chase/global-business-quest
+Project repo: github.com/roblox-chase/roblox-chase.github.io
