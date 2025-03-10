@@ -29,6 +29,7 @@ export const countries = {
                         id: 'greeting',
                         situation: 'You arrive at the office and meet your Japanese business partners.',
                         prompt: 'How do you greet your Japanese business partners?',
+                        skillId: 'bowing', // Added skillId for bowing skill
                         options: [
                             { 
                                 text: 'Bow slightly', 
@@ -52,6 +53,7 @@ export const countries = {
                         id: 'business_cards',
                         situation: 'Your Japanese counterpart presents you with their business card (meishi).',
                         prompt: 'How do you receive their business card?',
+                        skillId: 'meishi', // Added skillId for business card exchange skill
                         options: [
                             { 
                                 text: 'Accept with both hands, examine it carefully, then place it respectfully on the table', 
@@ -89,6 +91,7 @@ export const countries = {
                         id: 'greeting',
                         situation: 'You arrive at the restaurant and meet your French business associates.',
                         prompt: 'How do you greet your French business associates?',
+                        skillId: 'greeting', // Added skillId for French greeting skill
                         options: [
                             { 
                                 text: 'A light handshake and "Bonjour"', 
@@ -112,6 +115,7 @@ export const countries = {
                         id: 'wine_selection',
                         situation: 'The waiter asks if you would like to select the wine for the table.',
                         prompt: 'How do you respond?',
+                        skillId: 'wine', // Added skillId for wine etiquette skill
                         options: [
                             { 
                                 text: 'Politely defer to your French host, saying "I would be interested in your recommendation"', 
