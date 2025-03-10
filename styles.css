@@ -563,3 +563,348 @@ html {
     font-size: 16px;
   }
 }
+
+/* Cultural Competence Styling */
+
+/* Competence Badge on Country Selection */
+.competence-badge {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Button */
+.profile-button {
+  margin-top: 1.5rem;
+  background-color: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+.profile-button:hover {
+  background-color: #5541d8;
+}
+
+/* Competence Profile Page */
+.country-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.country-tab {
+  padding: 0.7rem 1.2rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #555;
+}
+
+.country-tab:hover {
+  color: var(--primary-color);
+}
+
+.country-tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.country-competence-panel {
+  display: none;
+  padding: 1rem 0;
+}
+
+.competence-level-info {
+  margin-bottom: 1.5rem;
+}
+
+.competence-progress {
+  margin-top: 0.8rem;
+}
+
+.competence-bar {
+  height: 12px;
+  background-color: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.competence-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width 0.5s ease;
+}
+
+.skills-section {
+  margin-top: 1.5rem;
+}
+
+.skills-section h4 {
+  margin-bottom: 1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.4rem;
+}
+
+.skills-list {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.skill-item {
+  display: flex;
+  padding: 0.8rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.skill-item.locked {
+  opacity: 0.7;
+  border-left-color: #aaa;
+}
+
+.skill-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-icon.locked {
+  background-color: #aaa;
+}
+
+/* Japan specific skill icons */
+.skill-icon.japan-bowing::before {
+  content: "🙇";
+  font-size: 1.4rem;
+}
+
+.skill-icon.japan-meishi::before {
+  content: "🪪";
+  font-size: 1.2rem;
+}
+
+.skill-icon.japan-honorifics::before {
+  content: "敬";
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* France specific skill icons */
+.skill-icon.france-greeting::before {
+  content: "👋";
+  font-size: 1.4rem;
+}
+
+.skill-icon.france-wine::before {
+  content: "🍷";
+  font-size: 1.4rem;
+}
+
+.skill-icon.france-conversation::before {
+  content: "💬";
+  font-size: 1.3rem;
+}
+
+.skill-details {
+  flex-grow: 1;
+}
+
+.skill-details h5 {
+  margin: 0 0 0.3rem 0;
+  color: #333;
+}
+
+.skill-details p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.next-skill-section {
+  margin-top: 1.5rem;
+}
+
+.no-skills {
+  font-style: italic;
+  color: #777;
+  padding: 0.5rem;
+}
+
+.total-competence-score {
+  background-color: #f8f9fa;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.total-competence-score h3 {
+  margin: 0;
+  color: #333;
+}
+
+.return-button {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.return-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* Button container for multiple buttons */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+/* Skill unlock notification */
+.skill-unlock-notification {
+  position: fixed;
+  bottom: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 1.2rem;
+  z-index: 1000;
+  transition: bottom 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skill-unlock-notification.show {
+  bottom: 20px;
+}
+
+.skill-unlock-notification h3 {
+  color: var(--primary-color);
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.skill-unlock-notification .skill-icon {
+  margin: 0.5rem 0;
+  width: 60px;
+  height: 60px;
+}
+
+.skill-unlock-notification .skill-details {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.skill-unlock-notification .skill-details h4 {
+  margin: 0.5rem 0;
+}
+
+.skill-unlock-notification .skill-details p {
+  margin: 0;
+}
+
+.notification-close {
+  padding: 0.7rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+/* Competence update section */
+.competence-update {
+  background-color: #f0f7ff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid #4c72b0;
+}
+
+.competence-update h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.competence-update p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+}
+
+/* Responsive adjustments for cultural competence system */
+@media (min-width: 481px) and (max-width: 768px) {
+  .skills-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .button-container {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .return-button, .profile-button {
+    width: auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .skills-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .button-container {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .return-button, .profile-button {
+    width: auto;
+  }
+  
+  .skill-unlock-notification {
+    max-width: 500px;
+  }
+  
+  .skill-unlock-notification .skill-icon {
+    width: 70px;
+    height: 70px;
+  }
+}
