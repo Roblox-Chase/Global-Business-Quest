@@ -1,4 +1,4 @@
-/* Global Business Quest - Main Stylesheet */
+/* Global Business Quest - Main Stylesheet with Enhanced Mobile Support */
 
 /* Reset and base styles */
 * {
@@ -7,9 +7,36 @@
   box-sizing: border-box;
 }
 
+:root {
+  --primary-color: #4c72b0;
+  --primary-hover: #365d8d;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --text-color: #333;
+  --light-bg: #f8f9fa;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --border-radius: 5px;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+}
+
+/* Mobile-first approach - basic layout */
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -28,25 +55,26 @@ body {
   color: white;
   z-index: 999;
   text-align: center;
+  padding: 1rem;
 }
 
 #loading-screen h1 {
-  font-size: 3rem;
+  font-size: 2rem;
   margin-bottom: 1rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #loading-screen p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  max-width: 80%;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  max-width: 90%;
 }
 
 #loading-bar-container {
-  width: 50%;
-  height: 20px;
+  width: 80%;
+  height: 16px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -55,23 +83,45 @@ body {
   height: 100%;
   width: 0%;
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
   transition: width 0.3s ease-out;
 }
 
-/* Game UI containers */
+/* UI containers positioning */
 #ui-container {
-  font-size: 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* Let clicks pass through to 3D scene except for UI elements */
+  z-index: 10;
+  padding: 1rem;
 }
 
+#ui-container > div {
+  pointer-events: auto; /* Enable clicks on actual UI elements */
+}
+
+/* Country selection */
 #country-selection {
-  max-width: 600px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
   text-align: center;
+  padding: 1.5rem 1rem;
+  margin: 0 auto;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 #country-selection h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
   color: #2c3e50;
 }
@@ -79,36 +129,102 @@ body {
 #country-selection p {
   margin-bottom: 1.5rem;
   color: #555;
+  font-size: 0.95rem;
 }
 
 .country-button {
+  margin-bottom: 1rem;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: 1px solid #eee;
 }
 
-.country-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.country-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.country-button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.8rem;
+}
+
+.country-image {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  margin-bottom: 0.8rem;
+  border-radius: var(--border-radius);
+}
+
+.country-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.country-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+  color: var(--primary-color);
+}
+
+.country-info p {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+  color: #666;
+}
+
+.competence-badge {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.3rem 0.7rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
 }
 
 /* Scenario UI */
 #scenario-ui {
-  max-width: 800px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1rem;
+  margin: 0 auto;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 #scenario-ui h3 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
   color: #2c3e50;
 }
 
 #scenario-ui p {
   margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.situation {
+  font-style: italic;
+  background-color: var(--light-bg);
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
 }
 
 .prompt {
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 1rem 0;
   color: #2c3e50;
 }
@@ -120,86 +236,91 @@ body {
 }
 
 .option-button {
-  padding: 12px 20px;
-  background-color: #4c72b0;
+  padding: 1rem;
+  background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: background-color 0.2s, transform 0.1s;
   text-align: left;
+  line-height: 1.4;
 }
 
 .option-button:hover {
-  background-color: #365d8d;
-  transform: translateY(-2px);
+  background-color: var(--primary-hover);
 }
 
 .option-button:active {
-  transform: translateY(0);
+  transform: translateY(2px);
 }
 
 /* Option button disabled state */
 .option-button:disabled {
   background-color: #90a4c5;
   cursor: not-allowed;
-  transform: translateY(0);
 }
 
 /* Feedback UI */
 #feedback-ui {
-  max-width: 600px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  padding: 20px;
+  width: 90%;
+  max-width: 500px;
   background-color: white;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin: 0 auto;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 #feedback-ui h3 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
 #feedback-ui p {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
 }
 
 .continue-button {
-  padding: 12px 30px;
-  background-color: #4c72b0;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: background-color 0.2s, transform 0.1s;
   margin-top: 1rem;
+  width: 100%;
+  max-width: 250px;
 }
 
 .continue-button:hover {
-  background-color: #365d8d;
-  transform: translateY(-2px);
+  background-color: var(--primary-hover);
 }
 
 .continue-button:active {
-  transform: translateY(0);
+  transform: translateY(2px);
 }
 
 /* Cultural Insight Styling */
 .cultural-insight {
-  background-color: #f8f9fa;
-  border-left: 4px solid #4c72b0;
-  padding: 15px;
-  margin: 20px 0;
+  background-color: var(--light-bg);
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem;
+  margin: 1.2rem 0;
   font-style: italic;
   text-align: left;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  border-radius: 0 5px 5px 0;
-  line-height: 1.6;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
 }
 
 /* Scenario Complete Styling */
@@ -208,25 +329,25 @@ body {
 }
 
 .scenario-complete h3 {
-  color: #28a745;
-  font-size: 2rem;
-  margin-bottom: 20px;
+  color: var(--success-color);
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
 }
 
 /* Score display */
 #score-display {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 10px;
   right: 10px;
   background-color: white;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
   z-index: 100;
 }
 
 #score-display h3 {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   color: #2c3e50;
   margin: 0;
 }
@@ -239,38 +360,158 @@ body {
   right: 10px;
   background-color: rgba(220, 53, 69, 0.9);
   color: white;
-  padding: 15px;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: var(--border-radius);
   z-index: 1000;
   text-align: center;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: none;
   animation: fadeIn 0.3s ease-in-out;
+  font-size: 0.95rem;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
+/* Tablet styles */
+@media (min-width: 481px) and (max-width: 768px) {
   #loading-screen h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
   
   #loading-bar-container {
-    width: 80%;
+    width: 70%;
   }
   
-  #country-selection, #scenario-ui, #feedback-ui {
-    width: 90%;
-    max-width: 90%;
+  #country-selection h2 {
+    font-size: 1.7rem;
+  }
+  
+  #scenario-ui h3, #feedback-ui h3 {
+    font-size: 1.4rem;
+  }
+  
+  .country-button-content {
+    flex-direction: row;
+    text-align: left;
+  }
+  
+  .country-image {
+    width: 40%;
+    height: 100px;
+    margin-right: 1rem;
+    margin-bottom: 0;
+  }
+  
+  .country-info {
+    width: 60%;
   }
   
   .option-button {
-    padding: 15px;
+    padding: 0.9rem 1.2rem;
     font-size: 1rem;
   }
   
+  .continue-button {
+    width: auto;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  body {
+    font-size: 16px;
+  }
+  
+  #loading-screen h1 {
+    font-size: 3rem;
+  }
+  
+  #loading-screen p {
+    font-size: 1.2rem;
+  }
+  
+  #loading-bar-container {
+    width: 50%;
+    height: 20px;
+  }
+  
+  #country-selection {
+    padding: 2rem;
+  }
+  
+  #country-selection h2 {
+    font-size: 2rem;
+  }
+  
+  #country-selection p {
+    font-size: 1.1rem;
+  }
+  
+  .country-button-content {
+    flex-direction: row;
+    text-align: left;
+    padding: 1rem;
+  }
+  
+  .country-image {
+    width: 200px;
+    height: 150px;
+    margin-right: 1.5rem;
+    margin-bottom: 0;
+  }
+  
+  .country-info {
+    width: calc(100% - 220px);
+  }
+  
+  .country-info h3 {
+    font-size: 1.4rem;
+  }
+  
+  .country-info p {
+    font-size: 1rem;
+  }
+  
+  #scenario-ui, #feedback-ui {
+    padding: 2rem;
+  }
+  
+  #scenario-ui h3 {
+    font-size: 1.8rem;
+  }
+  
+  #scenario-ui p, #feedback-ui p {
+    font-size: 1.1rem;
+  }
+  
+  .prompt {
+    font-size: 1.2rem;
+  }
+  
+  .option-button {
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .option-button:hover {
+    transform: translateY(-2px);
+  }
+  
   .cultural-insight {
-    padding: 10px;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
+    padding: 1.2rem;
+  }
+  
+  .continue-button {
+    width: auto;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+  }
+  
+  #score-display {
+    padding: 0.8rem 1.2rem;
+  }
+  
+  #score-display h3 {
+    font-size: 1.1rem;
   }
 }
 
@@ -291,4 +532,34 @@ body {
 @keyframes slideUp {
   from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Smooth scrolling for all browsers */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) {
+  .option-button, .continue-button, .country-button {
+    transition: background-color 0.2s;
+  }
+  
+  /* Remove all hover effects on touch devices */
+  .option-button:hover, .continue-button:hover, .country-button:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+  
+  /* Larger touch targets */
+  .option-button, .continue-button {
+    min-height: 44px;
+  }
+}
+
+/* Prevent zooming on inputs on iOS */
+@supports (-webkit-touch-callout: none) {
+  input, button {
+    font-size: 16px;
+  }
 }
