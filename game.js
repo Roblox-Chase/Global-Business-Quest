@@ -1,5 +1,5 @@
 // Global Business Quest - Main Game Controller
-// This file sets up the core game environment and mechanics
+// This file sets up the core game environment and mechanics with mobile optimizations
 
 // Import Three.js and related modules
 import * as THREE from 'three';
@@ -22,6 +22,10 @@ class GlobalBusinessQuest {
         this.countries = countries;
         this.activeEnvironment = null;
         
+        // Detect if mobile device
+        this.isMobile = this.detectMobile();
+        console.log("Device detected as:", this.isMobile ? "mobile" : "desktop");
+        
         // Initialize Three.js
         if (!this.initThreeJS()) {
             console.error("Failed to initialize Three.js, cannot continue");
@@ -38,6 +42,19 @@ class GlobalBusinessQuest {
             console.error("Failed to initialize UI manager:", error);
             this.showErrorMessage("Failed to initialize UI: " + error.message);
         }
+        
+        // Add orientation change listener for mobile
+        if (this.isMobile) {
+            window.addEventListener('orientationchange', () => {
+                console.log("Orientation changed, adjusting display...");
+                setTimeout(() => this.onWindowResize(), 200); // Delay to allow browser to update dimensions
+            });
+        }
+    }
+    
+    detectMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            || (window.innerWidth <= 768);
     }
     
     initThreeJS() {
@@ -48,13 +65,23 @@ class GlobalBusinessQuest {
             this.scene = new THREE.Scene();
             this.scene.background = new THREE.Color(0x87CEEB); // Sky blue background
             
-            // Camera setup
-            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            this.camera.position.set(0, 1.6, 5); // Positioning camera at human eye level
+            // Camera setup - adjust for mobile
+            const fov = this.isMobile ? 85 : 75; // Wider FOV on mobile for better view
+            this.camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // Position camera based on device
+            if (this.isMobile) {
+                this.camera.position.set(0, 2, 7); // Further back on mobile for better view
+            } else {
+                this.camera.position.set(0, 1.6, 5); // Standard position on desktop
+            }
             
             // Renderer setup with error checking
             try {
-                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: !this.isMobile, // Disable antialiasing on mobile for performance
+                    powerPreference: this.isMobile ? 'low-power' : 'high-performance'
+                });
             } catch (error) {
                 console.error("WebGL renderer creation failed:", error);
                 this.showErrorMessage("Failed to initialize WebGL. Please use a modern browser that supports WebGL.");
@@ -62,7 +89,8 @@ class GlobalBusinessQuest {
             }
             
             this.renderer.setSize(window.innerWidth, window.innerHeight);
-            this.renderer.shadowMap.enabled = true;
+            this.renderer.setPixelRatio(this.isMobile ? Math.min(window.devicePixelRatio, 2) : window.devicePixelRatio);
+            this.renderer.shadowMap.enabled = !this.isMobile; // Disable shadows on mobile for performance
             
             // Get the container and add the renderer
             const container = document.getElementById('game-container');
@@ -78,6 +106,13 @@ class GlobalBusinessQuest {
                 this.controls.enableDamping = true;
                 this.controls.dampingFactor = 0.05;
                 this.controls.maxPolarAngle = Math.PI / 2; // Prevent camera from going below ground
+                
+                // Adjust controls for mobile
+                if (this.isMobile) {
+                    this.controls.rotateSpeed = 0.7; // Slower rotation for easier control
+                    this.controls.enableZoom = false; // Disable pinch zoom on mobile to avoid conflicts
+                    this.controls.enablePan = false; // Disable panning on mobile
+                }
             } catch (error) {
                 console.error("OrbitControls initialization failed:", error);
                 // We can continue without controls if necessary
@@ -92,7 +127,8 @@ class GlobalBusinessQuest {
             // Handle window resize
             window.addEventListener('resize', () => this.onWindowResize(), false);
             
-            // Start animation loop
+            // Start animation loop with performance optimization
+            this.lastTime = 0;
             this.animate();
             
             console.log("Three.js initialization complete!");
@@ -125,37 +161,82 @@ class GlobalBusinessQuest {
         
         errorDisplay.innerHTML = message;
         errorDisplay.style.display = 'block';
+        
+        // Auto-hide after 7 seconds on mobile
+        if (this.isMobile) {
+            setTimeout(() => {
+                errorDisplay.style.opacity = '0';
+                errorDisplay.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    errorDisplay.style.display = 'none';
+                    errorDisplay.style.opacity = '1';
+                }, 500);
+            }, 7000);
+        }
     }
     
     addLights() {
         // Ambient light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        const ambientIntensity = this.isMobile ? 0.7 : 0.5; // Brighter ambient on mobile
+        const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
         this.scene.add(ambientLight);
         
         // Directional light (sun)
         const dirLight = new THREE.DirectionalLight(0xffffff, 1);
         dirLight.position.set(5, 10, 7.5);
-        dirLight.castShadow = true;
+        dirLight.castShadow = !this.isMobile; // Don't cast shadows on mobile for performance
+        
+        // Optimize shadow settings based on device
+        if (!this.isMobile) {
+            // Higher quality shadows for desktop
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            dirLight.shadow.camera.near = 0.5;
+            dirLight.shadow.camera.far = 50;
+        }
+        
         this.scene.add(dirLight);
     }
     
     addGround() {
-        const groundGeometry = new THREE.PlaneGeometry(100, 100);
+        // Use smaller plane on mobile for performance
+        const groundSize = this.isMobile ? 50 : 100;
+        const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize);
         const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x1a5e1a });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
+        ground.receiveShadow = !this.isMobile; // No shadows on mobile
         this.scene.add(ground);
     }
     
     onWindowResize() {
+        // Update mobile detection on resize
+        this.isMobile = this.detectMobile();
+        
+        // Update camera aspect ratio
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
+        
+        // Update renderer size
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        // Update pixel ratio with limits for mobile
+        this.renderer.setPixelRatio(this.isMobile ? Math.min(window.devicePixelRatio, 2) : window.devicePixelRatio);
+        
+        console.log("Resized game view for", this.isMobile ? "mobile" : "desktop");
     }
     
-    animate() {
-        requestAnimationFrame(() => this.animate());
+    animate(time) {
+        requestAnimationFrame((t) => this.animate(t));
+        
+        // For mobile, limit frames for battery saving
+        if (this.isMobile) {
+            // Skip frames on mobile for power saving (target ~30fps)
+            if (time - this.lastTime < 33) { // ~30fps
+                return;
+            }
+            this.lastTime = time;
+        }
         
         try {
             // Update controls if they exist
@@ -165,7 +246,7 @@ class GlobalBusinessQuest {
             
             // Update active environment if it exists
             if (this.activeEnvironment && this.activeEnvironment.animate) {
-                this.activeEnvironment.animate(performance.now());
+                this.activeEnvironment.animate(time);
             }
             
             // Render scene
@@ -191,8 +272,14 @@ class GlobalBusinessQuest {
             // Load the country environment
             this.activeEnvironment = createCountryEnvironment(this.scene, countryId);
             
-            // Position camera appropriately
-            this.camera.position.set(0, 2, 4);
+            // Position camera appropriately based on device
+            if (this.isMobile) {
+                // Further back and higher for better visibility on mobile
+                this.camera.position.set(0, 2.5, 5.5);
+            } else {
+                this.camera.position.set(0, 2, 4);
+            }
+            
             this.camera.lookAt(0, 0.5, 0);
             
             // Start first scenario
@@ -255,11 +342,14 @@ class GlobalBusinessQuest {
             // Move to next interaction after a delay
             this.currentInteractionIndex++;
             
+            // Adjust delay based on device - mobile users might need more time to read
+            const feedbackDelay = this.isMobile ? 3500 : 3000;
+            
             // Automatically advance to next question after a delay
             setTimeout(() => {
                 this.uiManager.hideFeedback();
                 this.nextInteraction();
-            }, 3000); // 3 second delay to read feedback
+            }, feedbackDelay);
         } catch (error) {
             console.error("Error processing option selection:", error);
             this.showErrorMessage(`Error processing selection: ${error.message}`);
@@ -272,6 +362,12 @@ class GlobalBusinessQuest {
         try {
             // Show scenario completion screen
             this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+            
+            // On mobile, simplify the 3D scene when showing completion to improve performance
+            if (this.isMobile && this.activeEnvironment) {
+                // Reduce animation complexity or stop non-essential animations
+                this.simplifyScene();
+            }
         } catch (error) {
             console.error("Error ending scenario:", error);
             this.showErrorMessage(`Error completing scenario: ${error.message}`);
@@ -282,35 +378,65 @@ class GlobalBusinessQuest {
             }, 1000);
         }
     }
+    
+    simplifyScene() {
+        // This method reduces scene complexity for mobile when showing completion screen
+        
+        // Remove or hide non-essential elements
+        try {
+            // Example: Find and disable any animations or particles
+            this.scene.traverse((object) => {
+                // Disable any particle systems or complex animations
+                // This is a placeholder - actual implementation depends on your scene structure
+                if (object.userData && object.userData.isComplexAnimation) {
+                    object.visible = false;
+                }
+            });
+            
+            // Reduce shadow quality even further
+            this.renderer.shadowMap.enabled = false;
+            
+            console.log("Simplified scene for mobile completion screen");
+        } catch (error) {
+            console.error("Error simplifying scene:", error);
+            // Non-critical error, don't show to user
+        }
+    }
 }
 
 // Initialize the game when page loads
 window.addEventListener('DOMContentLoaded', () => {
     console.log("DOM fully loaded, initializing game...");
-    try {
-        const game = new GlobalBusinessQuest();
-    } catch (error) {
-        console.error("Failed to initialize game:", error);
-        
-        // Create error display if it doesn't exist
-        let errorDisplay = document.getElementById('error-display');
-        if (!errorDisplay) {
-            errorDisplay = document.createElement('div');
-            errorDisplay.id = 'error-display';
-            errorDisplay.style.position = 'fixed';
-            errorDisplay.style.top = '10px';
-            errorDisplay.style.left = '10px';
-            errorDisplay.style.right = '10px';
-            errorDisplay.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
-            errorDisplay.style.color = 'white';
-            errorDisplay.style.padding = '15px';
-            errorDisplay.style.borderRadius = '5px';
-            errorDisplay.style.zIndex = '1000';
-            errorDisplay.style.textAlign = 'center';
-            document.body.appendChild(errorDisplay);
+    
+    // Add a small delay on mobile to ensure all resources are ready
+    const initDelay = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 100 : 0;
+    
+    setTimeout(() => {
+        try {
+            const game = new GlobalBusinessQuest();
+        } catch (error) {
+            console.error("Failed to initialize game:", error);
+            
+            // Create error display if it doesn't exist
+            let errorDisplay = document.getElementById('error-display');
+            if (!errorDisplay) {
+                errorDisplay = document.createElement('div');
+                errorDisplay.id = 'error-display';
+                errorDisplay.style.position = 'fixed';
+                errorDisplay.style.top = '10px';
+                errorDisplay.style.left = '10px';
+                errorDisplay.style.right = '10px';
+                errorDisplay.style.backgroundColor = 'rgba(220, 53, 69, 0.9)';
+                errorDisplay.style.color = 'white';
+                errorDisplay.style.padding = '15px';
+                errorDisplay.style.borderRadius = '5px';
+                errorDisplay.style.zIndex = '1000';
+                errorDisplay.style.textAlign = 'center';
+                document.body.appendChild(errorDisplay);
+            }
+            
+            errorDisplay.innerHTML = `Failed to initialize game: ${error.message}`;
+            errorDisplay.style.display = 'block';
         }
-        
-        errorDisplay.innerHTML = `Failed to initialize game: ${error.message}`;
-        errorDisplay.style.display = 'block';
-    }
+    }, initDelay);
 });
