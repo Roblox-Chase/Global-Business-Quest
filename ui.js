@@ -1,6 +1,9 @@
 // Global Business Quest - UI Management
 // This module handles the user interface
 
+// Global Business Quest - UI Management
+// This module handles the user interface
+
 export class UIManager {
     constructor(gameInstance) {
         this.game = gameInstance;
@@ -194,5 +197,49 @@ export class UIManager {
         if (!this.scoreDisplay) return;
         
         this.scoreDisplay.innerHTML = `<h3>Cultural Competence: ${score}</h3>`;
+    }
+    
+    showScenarioComplete(countryId, score) {
+        // Clear existing content
+        this.feedbackUI.innerHTML = '';
+        
+        // Add congratulations header
+        const congratsHeader = document.createElement('h3');
+        congratsHeader.textContent = 'Scenario Complete!';
+        congratsHeader.style.color = '#28a745';
+        this.feedbackUI.appendChild(congratsHeader);
+        
+        // Add score message
+        const scoreMsg = document.createElement('p');
+        scoreMsg.textContent = `You earned ${score} points in ${this.game.countries[countryId].name}!`;
+        this.feedbackUI.appendChild(scoreMsg);
+        
+        // Add cultural insight
+        const insightMsg = document.createElement('p');
+        insightMsg.className = 'cultural-insight';
+        
+        // Set country-specific message
+        if (countryId === 'japan') {
+            insightMsg.textContent = 'You\'ve demonstrated a good understanding of Japanese business etiquette. Respect, formality, and attention to detail are highly valued in Japanese business culture.';
+        } else if (countryId === 'france') {
+            insightMsg.textContent = 'You\'ve shown knowledge of French business customs. The French appreciate good manners, cultural awareness, and respect for their traditions.';
+        } else {
+            insightMsg.textContent = 'You\'ve gained valuable cultural insights that will help you in your global business career.';
+        }
+        
+        this.feedbackUI.appendChild(insightMsg);
+        
+        // Add return button
+        const returnButton = document.createElement('button');
+        returnButton.textContent = 'Return to Country Selection';
+        returnButton.className = 'continue-button';
+        returnButton.addEventListener('click', () => {
+            this.showCountrySelection();
+        });
+        this.feedbackUI.appendChild(returnButton);
+        
+        // Hide scenario UI and show feedback UI
+        this.scenarioUI.style.display = 'none';
+        this.feedbackUI.style.display = 'block';
     }
 }
