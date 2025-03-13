@@ -639,17 +639,23 @@ export class UIManager {
                 existingBadge.remove();
             }
             
-            // Get competence level and title
+            // Get competence level and title - ensure fresh data
             const points = this.game.competenceSystem.getCompetenceLevel(countryId);
             const title = this.game.competenceSystem.getCompetenceTitle(countryId);
             
+            // Always create a badge, but with different styling if no points
+            const competenceBadge = document.createElement('div');
+            competenceBadge.className = 'competence-badge';
+            
             if (points > 0) {
-                // Create competence badge
-                const competenceBadge = document.createElement('div');
-                competenceBadge.className = 'competence-badge';
                 competenceBadge.innerHTML = `${title}: ${points} points`;
-                button.appendChild(competenceBadge);
+                competenceBadge.classList.add('has-points');
+            } else {
+                competenceBadge.innerHTML = 'Not yet visited';
+                competenceBadge.classList.add('no-points');
             }
+            
+            button.appendChild(competenceBadge);
         });
         
         // Add profile button if competence system exists and button not already present
@@ -663,6 +669,9 @@ export class UIManager {
             });
             this.countrySelectionUI.appendChild(profileButton);
         }
+        
+        // Update total score display
+        this.updateScoreDisplay(this.game.competenceSystem.getTotalCompetence());
     }
     
     // Show a skill unlock notification
@@ -710,7 +719,7 @@ export class UIManager {
         }, 8000);
     }
     
-    // Updated showScenarioComplete to include competence information
+    // Updated showScenarioComplete to include competence information and fixed button classes
     showScenarioComplete(countryId, score) {
         // Clear existing content
         this.feedbackUI.innerHTML = '';
@@ -752,6 +761,9 @@ export class UIManager {
             `;
             
             completionContainer.appendChild(competenceUpdate);
+            
+            // Update the total score display
+            this.updateScoreDisplay(this.game.competenceSystem.getTotalCompetence());
         }
         
         // Add cultural insight
@@ -773,95 +785,30 @@ export class UIManager {
         const buttonContainer = document.createElement('div');
         buttonContainer.className = 'button-container';
         
-        // Add return button
-        const returnButton = document.createElement('button');
-        returnButton.textContent = 'Return to Country Selection';
-        returnButton.className = 'continue-button';
+        // Add continue button with updated class name
+        const continueButton = document.createElement('button');
+        continueButton.textContent = 'Continue Your Journey';
+        continueButton.className = 'continue-button continue-journey-button';
         
-        // Adjust button size for mobile devices
-        this.adjustButtonSizeForDevice(returnButton);
+        // Add event listener for continue button
+        continueButton.addEventListener('click', () => {
+            // This now properly handles the "Continue?" decision point in the flowchart
+            this.game.continueGame();
+        });
         
-        // Use touchend for faster response on mobile
-        if (this.isMobile) {
-            let touchStarted = false;
-            
-            returnButton.addEventListener('touchstart', () => {
-                touchStarted = true;
-                returnButton.classList.add('active');
-            }, { passive: true });
-            
-            returnButton.addEventListener('touchend', (e) => {
-                returnButton.classList.remove('active');
-                if (touchStarted) {
-                    e.preventDefault();
-                    this.showCountrySelection();
-                }
-                touchStarted = false;
-            });
-            
-            returnButton.addEventListener('touchcancel', () => {
-                returnButton.classList.remove('active');
-                touchStarted = false;
-            });
-            
-            // Keep click for desktop fallback
-            returnButton.addEventListener('click', () => {
-                this.showCountrySelection();
-            });
-        } else {
-            returnButton.addEventListener('click', () => {
-                this.showCountrySelection();
-            });
-        }
+        // Add view profile button
+        const profileButton = document.createElement('button');
+        profileButton.textContent = 'View Competence Profile';
+        profileButton.className = 'profile-button';
         
-        buttonContainer.appendChild(returnButton);
+        profileButton.addEventListener('click', () => {
+            this.showCompetenceProfile();
+        });
         
-        // Add view profile button if competence system exists
-        if (this.hasCompetenceSystem()) {
-            const profileButton = document.createElement('button');
-            profileButton.textContent = 'View Competence Profile';
-            profileButton.className = 'profile-button';
-            
-            // Adjust button size for mobile devices
-            this.adjustButtonSizeForDevice(profileButton);
-            
-            // Use touchend for faster response on mobile
-            if (this.isMobile) {
-                let touchStarted = false;
-                
-                profileButton.addEventListener('touchstart', () => {
-                    touchStarted = true;
-                    profileButton.classList.add('active');
-                }, { passive: true });
-                
-                profileButton.addEventListener('touchend', (e) => {
-                    profileButton.classList.remove('active');
-                    if (touchStarted) {
-                        e.preventDefault();
-                        this.showCompetenceProfile();
-                    }
-                    touchStarted = false;
-                });
-                
-                profileButton.addEventListener('touchcancel', () => {
-                    profileButton.classList.remove('active');
-                    touchStarted = false;
-                });
-                
-                // Keep click for desktop fallback
-                profileButton.addEventListener('click', () => {
-                    this.showCompetenceProfile();
-                });
-            } else {
-                profileButton.addEventListener('click', () => {
-                    this.showCompetenceProfile();
-                });
-            }
-            
-            buttonContainer.appendChild(profileButton);
-        }
-        
+        buttonContainer.appendChild(continueButton);
+        buttonContainer.appendChild(profileButton);
         completionContainer.appendChild(buttonContainer);
+        
         this.feedbackUI.appendChild(completionContainer);
         
         // Hide scenario UI and show feedback UI with animation
@@ -869,67 +816,15 @@ export class UIManager {
         this.feedbackUI.style.display = 'block';
         this.feedbackUI.classList.add('fade-in');
         
-        // On mobile, make sure feedback is visible
-        if (this.isMobile) {
-            setTimeout(() => {
-                this.feedbackUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
-        
         setTimeout(() => {
             this.feedbackUI.classList.remove('fade-in');
         }, 500);
-        
-        // Update score display
-        if (this.hasCompetenceSystem()) {
-            this.updateScoreDisplay(this.game.competenceSystem.getTotalCompetence());
-        }
     }
     
-    // Show a level up notification
-    showLevelUpNotification(countryId, newTitle) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'level-up-notification';
-        
-        notification.innerHTML = `
-            <h3>Cultural Level Up!</h3>
-            <p>Your understanding of ${this.game.countries[countryId].name} business culture has improved!</p>
-            <p>New Title: <strong>${newTitle}</strong></p>
-            <button class="notification-close">Continue</button>
-        `;
-        
-        // Add to body
-        document.body.appendChild(notification);
-        
-        // Show with animation
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-        
-        // Handle close button
-        notification.querySelector('.notification-close').addEventListener('click', () => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        });
-        
-        // Auto close after 8 seconds
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        notification.remove();
-                    }
-                }, 300);
-            }
-        }, 8000);
-    }
-    
-    // Show game complete screen
+    // Make sure the Game Complete Screen is fully implemented
     showGameComplete() {
+        console.log("Showing game complete screen");
+        
         // Clear existing content
         this.feedbackUI.innerHTML = '';
         
@@ -980,6 +875,9 @@ export class UIManager {
             
             countryBreakdown.appendChild(countryList);
             completionContainer.appendChild(countryBreakdown);
+            
+            // Update display immediately to ensure it's current
+            this.updateScoreDisplay(totalScore);
         }
         
         // Add achievement message based on competence
@@ -1001,71 +899,31 @@ export class UIManager {
             completionContainer.appendChild(achievementMsg);
         }
         
-        // Add tips for improvement
-        const tipsSection = document.createElement('div');
-        tipsSection.className = 'tips-section';
-        
-        const tipsTitle = document.createElement('h4');
-        tipsTitle.textContent = 'Tips for Global Business Success:';
-        tipsSection.appendChild(tipsTitle);
-        
-        const tipsList = document.createElement('ul');
-        tipsList.innerHTML = `
-            <li>Research cultural norms before visiting a new country</li>
-            <li>Show respect for local customs and traditions</li>
-            <li>Learn basic greetings in the local language</li>
-            <li>Understand business etiquette differences</li>
-            <li>Be patient and flexible in cross-cultural situations</li>
-        `;
-        
-        tipsSection.appendChild(tipsList);
-        completionContainer.appendChild(tipsSection);
-        
-        // Add restart button
+        // Add restart button with updated class name
         const restartButton = document.createElement('button');
-        restartButton.textContent = 'Restart Game';
-        restartButton.className = 'restart-button';
+        restartButton.textContent = 'Play Again';
+        restartButton.className = 'restart-button restart-game-button';
         
-        // Adjust button size for mobile devices
-        this.adjustButtonSizeForDevice(restartButton);
+        // Add event listener for restart button
+        restartButton.addEventListener('click', () => {
+            this.game.reset();
+        });
         
-        // Use touchend for faster response on mobile
-        if (this.isMobile) {
-            let touchStarted = false;
-            
-            restartButton.addEventListener('touchstart', () => {
-                touchStarted = true;
-                restartButton.classList.add('active');
-            }, { passive: true });
-            
-            restartButton.addEventListener('touchend', (e) => {
-                restartButton.classList.remove('active');
-                if (touchStarted) {
-                    e.preventDefault();
-                    this.game.reset();
-                    this.showCountrySelection();
-                }
-                touchStarted = false;
-            });
-            
-            restartButton.addEventListener('touchcancel', () => {
-                restartButton.classList.remove('active');
-                touchStarted = false;
-            });
-            
-            // Keep click for desktop fallback
-            restartButton.addEventListener('click', () => {
-                this.game.reset();
-                this.showCountrySelection();
-            });
-        } else {
-            restartButton.addEventListener('click', () => {
-                this.game.reset();
-                this.showCountrySelection();
-            });
-        }
+        // Add view profile button
+        const profileButton = document.createElement('button');
+        profileButton.textContent = 'View Final Competence Profile';
+        profileButton.className = 'profile-button';
         
-        completionContainer.appendChild(restartButton);
+        profileButton.addEventListener('click', () => {
+            this.showCompetenceProfile();
+        });
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.appendChild(restartButton);
+        buttonContainer.appendChild(profileButton);
+        completionContainer.appendChild(buttonContainer);
+        
         this.feedbackUI.appendChild(completionContainer);
         
         // Hide scenario UI and show feedback UI with animation
@@ -1073,15 +931,49 @@ export class UIManager {
         this.feedbackUI.style.display = 'block';
         this.feedbackUI.classList.add('fade-in');
         
-        // On mobile, make sure feedback is visible
-        if (this.isMobile) {
-            setTimeout(() => {
-                this.feedbackUI.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
-        
         setTimeout(() => {
             this.feedbackUI.classList.remove('fade-in');
         }, 500);
     }
-}
+    
+    // Show a level up notification
+    showLevelUpNotification(countryId, newTitle) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'level-up-notification';
+        
+        notification.innerHTML = `
+            <h3>Cultural Level Up!</h3>
+            <p>Your understanding of ${this.game.countries[countryId].name} business culture has improved!</p>
+            <p>New Title: <strong>${newTitle}</strong></p>
+            <button class="notification-close">Continue</button>
+        `;
+        
+        // Add to body
+        document.body.appendChild(notification);
+        
+        // Show with animation
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // Handle close button
+        notification.querySelector('.notification-close').addEventListener('click', () => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto close after 8 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 8000);
+    }
