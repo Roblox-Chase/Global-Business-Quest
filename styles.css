@@ -907,4 +907,148 @@ html {
     width: 70px;
     height: 70px;
   }
+/* Add these CSS styles to your existing stylesheet */
+
+/* Game Complete Screen */
+.game-complete {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.game-complete h2 {
+    color: #28a745;
+    margin-bottom: 15px;
+    font-size: 2.2rem;
+}
+
+.final-score {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 5px solid #28a745;
+}
+
+.country-breakdown {
+    text-align: left;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.country-breakdown ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+.country-breakdown li {
+    margin: 8px 0;
+    padding: 5px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.achievement-message {
+    font-style: italic;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #e9f7ef;
+    border-radius: 8px;
+    border-left: 5px solid #2ecc71;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.restart-button, .profile-button, .continue-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.restart-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.restart-button:hover {
+    background-color: #0069d9;
+}
+
+.profile-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.profile-button:hover {
+    background-color: #5a6268;
+}
+
+.continue-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.continue-button:hover {
+    background-color: #218838;
+}
+
+/* Competence Badge Styles */
+.competence-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    z-index: 5;
+}
+
+.competence-badge.has-points {
+    background-color: #28a745;
+    color: white;
+}
+
+.competence-badge.no-points {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px dashed #6c757d;
+}
+
+/* Level Up Notification */
+.level-up-notification {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+    transition: top 0.5s ease-in-out;
+    max-width: 350px;
+}
+
+.level-up-notification.show {
+    top: 20px;
+}
+  
 }
