@@ -2,15 +2,12 @@
 // This file manages the game scenarios, interactions and cultural learning outcome
 
 // Scenario class to handle individual business scenarios
-class Scenario {
-    constructor(id, title, description, scene, interactions) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.scene = scene;
-        this.interactions = interactions;
-        this.completed = false;
-        this.playerChoices = [];
+class ScenarioManager {
+    constructor(gameInstance) {
+        this.game = gameInstance;
+        this.scenarios = {};
+        this.currentScenario = null;
+        this.currentInteractionIndex = 0;
     }
 
   // Record player choice for analytics
@@ -72,7 +69,7 @@ class ScenarioManager {
     }
 
   // Initialize all game scenarios
-initializeScenarios() {
+ initializeScenarios() {
         // Add scenarios from each country
         Object.keys(this.game.countries).forEach(countryId => {
             const country = this.game.countries[countryId];
@@ -87,8 +84,8 @@ initializeScenarios() {
             });
         });
 
-        // Add additional scenarios
-        this.addAdditionalScenarios();
+        // Debug log to verify scenarios are loaded
+        console.log("Scenarios Initialized:", Object.keys(this.scenarios));
     }
       
   // Add additional scenarios from our extended content
@@ -150,11 +147,12 @@ initializeScenarios() {
   }
 
   // Move to next interaction
- nextInteraction() {
+nextInteraction() {
         try {
             // Check if we have a valid scenario
             if (!this.currentScenario) {
                 console.error("No current scenario found!");
+                console.log("Current Scenario State:", this.currentScenario);
                 this.showErrorMessage("No scenario is currently active.");
                 return false;
             }
@@ -201,6 +199,7 @@ initializeScenarios() {
             return false;
         }
     }
+}
 
   // Add a new scenario
   addScenario(countryId, scenarioData) {
