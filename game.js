@@ -87,6 +87,13 @@ class GlobalBusinessQuest {
                 );
             }
         });
+        
+        // Listen for storage events to detect localStorage changes
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'globalBusinessQuest_competence') {
+                console.log("localStorage competence data changed:", event);
+            }
+        });
     }
     
     // Method to initialize game flow event listeners
@@ -100,6 +107,17 @@ class GlobalBusinessQuest {
             } else if (event.target.classList.contains('restart-game-button')) {
                 this.reset();
             }
+        });
+    }
+    
+    // Debug method to output current game state
+    debug() {
+        console.log("Game state:", {
+            currentCountry: this.currentCountry,
+            currentScenario: this.currentScenario ? this.currentScenario.id : null,
+            playerScore: this.playerScore,
+            completedCountries: this.completedCountries || {},
+            competenceData: this.competenceSystem ? this.competenceSystem.getCompetenceSummary() : null
         });
     }
     
@@ -410,7 +428,7 @@ class GlobalBusinessQuest {
                 // Show interaction in UI
                 this.uiManager.showInteraction(interaction);
             } else {
-                // End of scenario - call endScenario instead of the old implementation
+                // End of scenario - call the enhanced endScenario method
                 this.endScenario();
             }
         } catch (error) {
@@ -455,7 +473,7 @@ class GlobalBusinessQuest {
         }
     }
     
-    // Method to handle scenario completion
+    // Enhanced method to handle scenario completion
     endScenario() {
         console.log("Scenario complete");
         
@@ -473,6 +491,12 @@ class GlobalBusinessQuest {
                 
                 // Show scenario completion screen with cultural competence update
                 this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+                
+                // Save progress explicitly
+                if (this.competenceSystem) {
+                    this.competenceSystem.saveData();
+                    console.log("Saved competence data after scenario completion");
+                }
                 
                 // Reset player score for next scenario
                 this.playerScore = 0;
@@ -522,16 +546,36 @@ class GlobalBusinessQuest {
         }
     }
     
-    // Method to handle continue/restart functionality
+    // Enhanced method to handle continue/restart functionality
     continueGame() {
-        // Reset current country and scenario
-        this.currentCountry = null;
-        this.currentScenario = null;
+        console.log("Continuing game - returning to country selection");
         
-        // Return to country selection
+        // Reset current scenario state
+        this.currentScenario = null;
+        this.currentInteraction = null;
+        this.currentInteractionIndex = 0;
+        
+        // Keep track that we've completed this country
+        if (this.currentCountry && !this.completedCountries) {
+            this.completedCountries = {};
+        }
+        
+        if (this.currentCountry) {
+            this.completedCountries[this.currentCountry] = true;
+        }
+        
+        // Force save competence data again to ensure it's saved
+        if (this.competenceSystem) {
+            this.competenceSystem.saveData();
+        }
+        
+        // Reset current country but keep completed countries record
+        this.currentCountry = null;
+        
+        // Show country selection screen
         this.uiManager.showCountrySelection();
         
-        // Ensure competence profile is updated
+        // Ensure competence badges are updated
         if (this.uiManager.hasCompetenceSystem()) {
             this.uiManager.updateCountrySelectionWithCompetence();
         }
@@ -581,6 +625,54 @@ class GlobalBusinessQuest {
         }
     }
 }
+
+// Add global debug functions
+window.debugGame = function() {
+    if (!window.gameInstance) {
+        console.error("Game instance not found on window object");
+        return;
+    }
+    
+    const game = window.gameInstance;
+    
+    console.group("Game State Debug");
+    console.log("Current Country:", game.currentCountry);
+    console.log("Current Scenario:", game.currentScenario ? game.currentScenario.title : "none");
+    console.log("Current Interaction:", game.currentInteraction ? game.currentInteraction.id : "none");
+    console.log("Player Score:", game.playerScore);
+    console.log("Completed Countries:", game.completedCountries || "none");
+    
+    if (game.competenceSystem) {
+        console.group("Competence System");
+        console.log("Total Competence:", game.competenceSystem.getTotalCompetence());
+        console.log("Competence Levels:", game.competenceSystem.competenceLevels);
+        console.log("Competence Summary:", game.competenceSystem.getCompetenceSummary());
+        console.groupEnd();
+    }
+    
+    console.groupEnd();
+};
+
+// Add function to force save competence data
+window.saveCompetenceData = function() {
+    if (!window.gameInstance || !window.gameInstance.competenceSystem) {
+        console.error("Game instance or competence system not found");
+        return false;
+    }
+    
+    return window.gameInstance.competenceSystem.saveData();
+};
+
+// Add function to manually return to country selection
+window.returnToCountrySelection = function() {
+    if (!window.gameInstance) {
+        console.error("Game instance not found");
+        return;
+    }
+    
+    window.gameInstance.continueGame();
+    return "Returned to country selection";
+};
 
 // Initialize the game when page loads
 window.addEventListener('DOMContentLoaded', () => {
