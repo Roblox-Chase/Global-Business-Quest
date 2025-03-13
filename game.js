@@ -477,47 +477,45 @@ class GlobalBusinessQuest {
     }
     
     // Enhanced method to handle scenario completion
-    endScenario() {
-        console.log("Scenario complete");
-        
-        try {
-            // On mobile, simplify the 3D scene when showing completion to improve performance
-            if (this.isMobile && this.activeEnvironment) {
-                // Reduce animation complexity or stop non-essential animations
-                this.simplifyScene();
-            }
-            
-            // Award competence points for scenario completion
-            if (this.currentCountry) {
-                // Add points based on player score
-                this.awardCompetencePoints(this.currentCountry, this.playerScore);
-                
-                // Show scenario completion screen with cultural competence update
-                this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
-                
-                // Save progress explicitly
-                if (this.competenceSystem) {
-                    this.competenceSystem.saveData();
-                    console.log("Saved competence data after scenario completion");
-                }
-                
-                // Reset player score for next scenario
-                this.playerScore = 0;
-                
-                // Check if all scenarios for this country are complete
-                this.checkCountryCompletion();
-            }
-            
-        } catch (error) {
-            console.error("Error ending scenario:", error);
-            this.showErrorMessage(`Error completing scenario: ${error.message}`);
-            
-            // Fallback to country selection
-            setTimeout(() => {
-                this.uiManager.showCountrySelection();
-            }, 1000);
+   endScenario() {
+    console.log("Scenario complete");
+
+    try {
+        // On mobile, simplify the 3D scene when showing completion to improve performance
+        if (this.isMobile && this.activeEnvironment) {
+            this.simplifyScene();
         }
+
+        // Award competence points for scenario completion
+        if (this.currentCountry) {
+            // Add points based on player score
+            this.awardCompetencePoints(this.currentCountry, this.playerScore);
+
+            // Show scenario completion screen with cultural competence update
+            this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+
+            // Save progress explicitly
+            if (this.competenceSystem) {
+                this.competenceSystem.saveData();
+                console.log("Saved competence data after scenario completion");
+            }
+
+            // Reset player score for next scenario
+            this.playerScore = 0;
+
+            // Check if all scenarios for this country are complete
+            this.checkCountryCompletion();
+        }
+    } catch (error) {
+        console.error("Error ending scenario:", error);
+        this.showErrorMessage(`Error completing scenario: ${error.message}`);
+
+        // Fallback to country selection
+        setTimeout(() => {
+            this.uiManager.showCountrySelection();
+        }, 1000);
     }
+}
     
     // Method to check for country completion and proceed to Game Complete if needed
     checkCountryCompletion() {
@@ -550,39 +548,38 @@ class GlobalBusinessQuest {
     }
     
     // Enhanced method to handle continue/restart functionality
-    continueGame() {
-        console.log("Continuing game - returning to country selection");
-        
-        // Reset current scenario state
-        this.currentScenario = null;
-        this.currentInteraction = null;
-        this.currentInteractionIndex = 0;
-        
-        // Keep track that we've completed this country
-        if (this.currentCountry && !this.completedCountries) {
-            this.completedCountries = {};
-        }
-        
-        if (this.currentCountry) {
-            this.completedCountries[this.currentCountry] = true;
-        }
-        
-        // Force save competence data again to ensure it's saved
-        if (this.competenceSystem) {
-            this.competenceSystem.saveData();
-        }
-        
-        // Reset current country but keep completed countries record
-        this.currentCountry = null;
-        
-        // Show country selection screen
-        this.uiManager.showCountrySelection();
-        
-        // Ensure competence badges are updated
-        if (this.uiManager.hasCompetenceSystem()) {
-            this.uiManager.updateCountrySelectionWithCompetence();
-        }
+  continueGame() {
+    console.log("Continuing game - returning to country selection");
+
+    // Reset current scenario state
+    this.currentScenario = null;
+    this.currentInteraction = null;
+    this.currentInteractionIndex = 0;
+
+    // Keep track that we've completed this country
+    if (this.currentCountry && !this.completedCountries) {
+        this.completedCountries = {};
     }
+    if (this.currentCountry) {
+        this.completedCountries[this.currentCountry] = true;
+    }
+
+    // Force save competence data again to ensure it's saved
+    if (this.competenceSystem) {
+        this.competenceSystem.saveData();
+    }
+
+    // Reset current country but keep completed countries record
+    this.currentCountry = null;
+
+    // Show country selection screen
+    this.uiManager.showCountrySelection();
+
+    // Ensure competence badges are updated
+    if (this.uiManager.hasCompetenceSystem()) {
+        this.uiManager.updateCountrySelectionWithCompetence();
+    }
+}
     
     // Extended reset method to handle game complete condition
     reset() {
