@@ -419,23 +419,26 @@ class GlobalBusinessQuest {
     }
     
     nextInteraction() {
-        try {
-            // Check if we have more interactions
-            if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
-                const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
-                this.currentInteraction = interaction;
-                
-                // Show interaction in UI
-                this.uiManager.showInteraction(interaction);
-            } else {
-                // End of scenario - call the enhanced endScenario method
-                this.endScenario();
-            }
-        } catch (error) {
-            console.error("Error loading next interaction:", error);
-            this.showErrorMessage(`Error loading next interaction: ${error.message}`);
+    try {
+        // Check if we have more interactions
+        if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
+            const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
+            this.currentInteraction = interaction;
+
+            // Show interaction in UI
+            this.uiManager.showInteraction(interaction);
+
+            // Increment the interaction index for the next question
+            this.currentInteractionIndex++;
+        } else {
+            // End of scenario - call the enhanced endScenario method
+            this.endScenario();
         }
+    } catch (error) {
+        console.error("Error loading next interaction:", error);
+        this.showErrorMessage(`Error loading next interaction: ${error.message}`);
     }
+}
     
     selectOption(interaction, option) {
         console.log("Option selected:", option.text);
