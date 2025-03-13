@@ -4,6 +4,9 @@
 // Cultural Competence Tracking System
 // This module tracks and manages the player's cultural competence across countries
 
+// Cultural Competence Tracking System
+// This module tracks and manages the player's cultural competence across countries
+
 export class CulturalCompetenceSystem {
     constructor() {
         // Initialize country-specific competence levels
@@ -158,3 +161,237 @@ export class CulturalCompetenceSystem {
             return false;
         }
     }
+    
+    // Enhanced method to ensure points are properly added and events dispatched
+    addCompetencePoints(countryId, points) {
+        if (!this.competenceLevels.hasOwnProperty(countryId)) {
+            console.error(`Country ${countryId} not found in competence system`);
+            return false;
+        }
+        
+        // Convert points to number and validate
+        const pointsToAdd = parseInt(points) || 0;
+        if (pointsToAdd <= 0) {
+            console.warn(`Invalid points value: ${points}`);
+            return false;
+        }
+        
+        // Get previous level before adding points
+        const prevLevel = this.getCompetenceLevel(countryId);
+        const prevTitle = this.getCompetenceTitle(countryId);
+        
+        // Add points
+        this.competenceLevels[countryId] += pointsToAdd;
+        console.log(`Added ${pointsToAdd} competence points for ${countryId}. New level: ${this.competenceLevels[countryId]}`);
+        
+        // Get new level and title
+        const newLevel = this.getCompetenceLevel(countryId);
+        const newTitle = this.getCompetenceTitle(countryId);
+        
+        // Check if level title changed
+        if (prevTitle !== newTitle) {
+            // Dispatch level up event
+            const levelUpEvent = new CustomEvent('culturalLevelUp', {
+                detail: {
+                    countryId: countryId,
+                    prevLevel: prevLevel,
+                    newLevel: newLevel,
+                    prevTitle: prevTitle,
+                    newTitle: newTitle
+                }
+            });
+            document.dispatchEvent(levelUpEvent);
+        }
+        
+        // Check for newly unlocked skills
+        this.checkSkillUnlocks(countryId);
+        
+        // Save progress
+        this.saveData();
+        
+        return true;
+    }
+    
+    // Get current competence level for a country
+    getCompetenceLevel(countryId) {
+        if (this.competenceLevels.hasOwnProperty(countryId)) {
+            return this.competenceLevels[countryId];
+        }
+        return 0;
+    }
+    
+    // Get the competence title based on points
+    getCompetenceTitle(countryId) {
+        const points = this.getCompetenceLevel(countryId);
+        
+        // Find the highest threshold that is below or equal to the current points
+        let levelTitle = this.levelThresholds[0].title; // Default to lowest level
+        
+        for (const level of this.levelThresholds) {
+            if (points >= level.threshold) {
+                levelTitle = level.title;
+            } else {
+                break;
+            }
+        }
+        
+        return levelTitle;
+    }
+    
+    // Check for skill unlocks based on current points
+    checkSkillUnlocks(countryId) {
+        if (!this.culturalSkills.hasOwnProperty(countryId)) return;
+        
+        const points = this.competenceLevels[countryId];
+        const skills = this.culturalSkills[countryId];
+        
+        // Unlock skills based on competence level
+        // The thresholds for unlocking are arbitrary and can be adjusted
+        const skillsArray = Object.keys(skills);
+        
+        const pointsPerSkill = Math.ceil(100 / skillsArray.length);
+        
+        skillsArray.forEach((skillId, index) => {
+            const requiredPoints = pointsPerSkill * index; // First skill at 0, second at pointsPerSkill, etc.
+            
+            if (points >= requiredPoints && !skills[skillId].unlocked) {
+                // Unlock the skill
+                skills[skillId].unlocked = true;
+                
+                // Trigger any notification or UI update
+                this.onSkillUnlocked(countryId, skillId);
+                
+                // Save immediately after unlocking a skill
+                this.saveData();
+            }
+        });
+    }
+    
+    // Check all countries for skill unlocks
+    checkAllSkillUnlocks() {
+        for (const countryId in this.competenceLevels) {
+            this.checkSkillUnlocks(countryId);
+        }
+    }
+    
+    // Handler for when a skill is unlocked
+    onSkillUnlocked(countryId, skillId) {
+        console.log(`New cultural skill unlocked: ${this.culturalSkills[countryId][skillId].name}`);
+        
+        // We'll create a custom event that the UI can listen for
+        const event = new CustomEvent('culturalSkillUnlocked', {
+            detail: {
+                countryId: countryId,
+                skillId: skillId,
+                skillName: this.culturalSkills[countryId][skillId].name,
+                skillDescription: this.culturalSkills[countryId][skillId].description
+            }
+        });
+        
+        document.dispatchEvent(event);
+    }
+    
+    // Handler for level up events
+    onLevelUp(countryId, newTitle) {
+        console.log(`Level up in ${countryId} to ${newTitle}!`);
+        
+        // Dispatch event for UI to handle
+        const event = new CustomEvent('culturalLevelUp', {
+            detail: {
+                countryId: countryId,
+                title: newTitle
+            }
+        });
+        document.dispatchEvent(event);
+    }
+    
+    // Get all unlocked skills for a country
+    getUnlockedSkills(countryId) {
+        if (!this.culturalSkills.hasOwnProperty(countryId)) return [];
+        
+        const result = [];
+        const countrySkills = this.culturalSkills[countryId];
+        
+        for (const skillId in countrySkills) {
+            if (countrySkills[skillId].unlocked) {
+                result.push({
+                    id: skillId,
+                    name: countrySkills[skillId].name,
+                    description: countrySkills[skillId].description
+                });
+            }
+        }
+        
+        return result;
+    }
+    
+    // Get the next skill to unlock for a country
+    getNextSkill(countryId) {
+        if (!this.culturalSkills.hasOwnProperty(countryId)) return null;
+        
+        const countrySkills = this.culturalSkills[countryId];
+        
+        for (const skillId in countrySkills) {
+            if (!countrySkills[skillId].unlocked) {
+                return {
+                    id: skillId,
+                    name: countrySkills[skillId].name,
+                    description: countrySkills[skillId].description
+                };
+            }
+        }
+        
+        return null; // All skills unlocked
+    }
+    
+    // Calculate total competence across all countries
+    getTotalCompetence() {
+        let total = 0;
+        
+        for (const countryId in this.competenceLevels) {
+            total += this.competenceLevels[countryId];
+        }
+        
+        return total;
+    }
+    
+    // Get a summary of all competence levels and unlocked skills
+    getCompetenceSummary() {
+        const summary = {
+            total: this.getTotalCompetence(),
+            countries: {}
+        };
+        
+        for (const countryId in this.competenceLevels) {
+            summary.countries[countryId] = {
+                points: this.competenceLevels[countryId],
+                title: this.getCompetenceTitle(countryId),
+                skills: this.getUnlockedSkills(countryId),
+                nextSkill: this.getNextSkill(countryId)
+            };
+        }
+        
+        return summary;
+    }
+    
+    // Reset all progress (for testing or new game)
+    resetProgress() {
+        // Reset all competence levels to 0
+        for (const countryId in this.competenceLevels) {
+            this.competenceLevels[countryId] = 0;
+        }
+        
+        // Reset all skills to locked
+        for (const countryId in this.culturalSkills) {
+            for (const skillId in this.culturalSkills[countryId]) {
+                this.culturalSkills[countryId][skillId].unlocked = false;
+            }
+        }
+        
+        // Save the reset data
+        this.saveData();
+        
+        console.log('Cultural competence progress reset');
+        return true;
+    }
+}
