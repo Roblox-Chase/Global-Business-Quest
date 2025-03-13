@@ -54,34 +54,33 @@ class Scenario {
 
 // ScenarioManager class to handle all game scenarios
 class ScenarioManager {
-  constructor(gameInstance) {
-    this.game = gameInstance;
-    this.scenarios = {};
-    this.currentScenario = null;
-    this.currentInteractionIndex = 0;
-  }
+    constructor(gameInstance) {
+        this.game = gameInstance;
+        this.scenarios = {};
+        this.currentScenario = null;
+        this.currentInteractionIndex = 0;
+    }
 
   // Initialize all game scenarios
-  initializeScenarios() {
-    // Add scenarios from each country
-    Object.keys(this.game.countries).forEach(countryId => {
-      const country = this.game.countries[countryId];
+initializeScenarios() {
+        // Add scenarios from each country
+        Object.keys(this.game.countries).forEach(countryId => {
+            const country = this.game.countries[countryId];
+            country.scenarios.forEach(scenarioData => {
+                this.scenarios[scenarioData.id] = new Scenario(
+                    scenarioData.id,
+                    scenarioData.title,
+                    scenarioData.description,
+                    scenarioData.scene,
+                    scenarioData.interactions
+                );
+            });
+        });
+
+        // Add additional scenarios
+        this.addAdditionalScenarios();
+    }
       
-      country.scenarios.forEach(scenarioData => {
-        this.scenarios[scenarioData.id] = new Scenario(
-          scenarioData.id,
-          scenarioData.title,
-          scenarioData.description,
-          scenarioData.scene,
-          scenarioData.interactions
-        );
-      });
-    });
-    
-    // Add additional scenarios
-    this.addAdditionalScenarios();
-  }
-  
   // Add additional scenarios from our extended content
   addAdditionalScenarios() {
     Object.keys(additionalScenarios).forEach(countryId => {
@@ -94,22 +93,26 @@ class ScenarioManager {
   }
 
   // Start a specific scenario
-  startScenario(scenarioId) {
-    if (!this.scenarios[scenarioId]) {
-      console.error(`Scenario ${scenarioId} not found`);
-      return false;
+ startScenario(scenarioId) {
+        if (!this.scenarios[scenarioId]) {
+            console.error(`Scenario ${scenarioId} not found`);
+            return false;
+        }
+
+        // Set the current scenario
+        this.currentScenario = this.scenarios[scenarioId];
+        this.currentInteractionIndex = 0;
+
+        // Debug log to verify the current scenario
+        console.log("Current Scenario Set:", this.currentScenario.title);
+
+        // Signal to game that scenario is starting
+        if (this.game.onScenarioStart) {
+            this.game.onScenarioStart(this.currentScenario);
+        }
+
+        return true;
     }
-    
-    this.currentScenario = this.scenarios[scenarioId];
-    this.currentInteractionIndex = 0;
-    
-    // Signal to game that scenario is starting
-    if (this.game.onScenarioStart) {
-      this.game.onScenarioStart(this.currentScenario);
-    }
-    
-    return true;
-  }
 
   // Get current interaction
   getCurrentInteraction() {
@@ -137,28 +140,57 @@ class ScenarioManager {
   }
 
   // Move to next interaction
-  nextInteraction() {
-    if (!this.currentScenario) return false;
-    
-    this.currentInteractionIndex++;
-    
-    // Check if we've reached the end of the scenario
-    if (this.currentInteractionIndex >= this.currentScenario.interactions.length) {
-      const score = this.currentScenario.complete();
-      if (this.game.onScenarioComplete) {
-        this.game.onScenarioComplete(this.currentScenario, score);
-      }
-      return false;
+ nextInteraction() {
+        try {
+            // Check if we have a valid scenario
+            if (!this.currentScenario) {
+                console.error("No current scenario found!");
+                this.showErrorMessage("No scenario is currently active.");
+                return false;
+            }
+
+            // Debug log to verify the current scenario
+            console.log("Current Scenario:", this.currentScenario.title);
+
+            // Check if we have more interactions
+            if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
+                const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
+                this.currentInteraction = interaction;
+
+                // Debug log to verify the current interaction
+                console.log("Current Interaction:", interaction.prompt);
+
+                // Show interaction in UI
+                if (this.game.onInteractionStart) {
+                    this.game.onInteractionStart(interaction);
+                }
+
+                // Increment the interaction index for the next question
+                this.currentInteractionIndex++;
+                return true;
+            } else {
+                // End of scenario - call the enhanced endScenario method
+                const score = this.currentScenario.complete();
+
+                // Debug log to verify scenario completion
+                console.log("Scenario Completed:", this.currentScenario.title, "Score:", score);
+
+                if (this.game.onScenarioComplete) {
+                    this.game.onScenarioComplete(this.currentScenario, score);
+                }
+
+                // Reset current scenario after completion
+                this.currentScenario = null;
+                this.currentInteractionIndex = 0;
+
+                return false;
+            }
+        } catch (error) {
+            console.error("Error loading next interaction:", error);
+            this.showErrorMessage(`Error loading next interaction: ${error.message}`);
+            return false;
+        }
     }
-    
-    // Get the next interaction and signal to game
-    const nextInteraction = this.getCurrentInteraction();
-    if (this.game.onInteractionStart) {
-      this.game.onInteractionStart(nextInteraction);
-    }
-    
-    return true;
-  }
 
   // Add a new scenario
   addScenario(countryId, scenarioData) {
