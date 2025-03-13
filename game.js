@@ -23,6 +23,7 @@ class GlobalBusinessQuest {
         this.playerScore = 0;
         this.countries = countries;
         this.activeEnvironment = null;
+        this.completedCountries = {};
         
         // Initialize Cultural Competence System
         this.competenceSystem = new CulturalCompetenceSystem();
@@ -66,6 +67,40 @@ class GlobalBusinessQuest {
                 setTimeout(() => this.onWindowResize(), 200); // Delay to allow browser to update dimensions
             });
         }
+        
+        // Listen for competence data updated events
+        document.addEventListener('competenceDataUpdated', (event) => {
+            // Update UI with new competence data
+            if (this.uiManager) {
+                this.uiManager.updateScoreDisplay(event.detail.totalCompetence);
+                this.uiManager.updateCountrySelectionWithCompetence();
+            }
+        });
+        
+        // Listen for cultural level up events
+        document.addEventListener('culturalLevelUp', (event) => {
+            // Show level up notification
+            if (this.uiManager) {
+                this.uiManager.showLevelUpNotification(
+                    event.detail.countryId, 
+                    event.detail.newTitle
+                );
+            }
+        });
+    }
+    
+    // Method to initialize game flow event listeners
+    initGameFlowEventListeners() {
+        console.log("Initializing game flow event listeners");
+        
+        // Event delegation for continue buttons on the completion screens
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('continue-journey-button')) {
+                this.continueGame();
+            } else if (event.target.classList.contains('restart-game-button')) {
+                this.reset();
+            }
+        });
     }
     
     // Cultural Competence System Methods
@@ -375,7 +410,7 @@ class GlobalBusinessQuest {
                 // Show interaction in UI
                 this.uiManager.showInteraction(interaction);
             } else {
-                // End of scenario
+                // End of scenario - call endScenario instead of the old implementation
                 this.endScenario();
             }
         } catch (error) {
@@ -420,6 +455,7 @@ class GlobalBusinessQuest {
         }
     }
     
+    // Method to handle scenario completion
     endScenario() {
         console.log("Scenario complete");
         
@@ -430,8 +466,20 @@ class GlobalBusinessQuest {
                 this.simplifyScene();
             }
             
-            // Show scenario completion screen with cultural competence update
-            this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+            // Award competence points for scenario completion
+            if (this.currentCountry) {
+                // Add points based on player score
+                this.awardCompetencePoints(this.currentCountry, this.playerScore);
+                
+                // Show scenario completion screen with cultural competence update
+                this.uiManager.showScenarioComplete(this.currentCountry, this.playerScore);
+                
+                // Reset player score for next scenario
+                this.playerScore = 0;
+                
+                // Check if all scenarios for this country are complete
+                this.checkCountryCompletion();
+            }
             
         } catch (error) {
             console.error("Error ending scenario:", error);
@@ -441,6 +489,71 @@ class GlobalBusinessQuest {
             setTimeout(() => {
                 this.uiManager.showCountrySelection();
             }, 1000);
+        }
+    }
+    
+    // Method to check for country completion and proceed to Game Complete if needed
+    checkCountryCompletion() {
+        if (!this.currentCountry) return;
+        
+        const country = this.countries[this.currentCountry];
+        if (!country) return;
+        
+        // For demonstration, we'll consider the country complete after the first scenario
+        // In a real implementation, you would track which scenarios are completed
+        
+        // Store completion status
+        if (!this.completedCountries) {
+            this.completedCountries = {};
+        }
+        this.completedCountries[this.currentCountry] = true;
+        
+        // Check if all available countries are completed
+        const allCountriesCompleted = Object.keys(this.countries).every(
+            countryId => this.completedCountries[countryId]
+        );
+        
+        // If all countries are completed, show the game complete screen after a delay
+        if (allCountriesCompleted) {
+            console.log("All countries completed! Showing game complete screen...");
+            setTimeout(() => {
+                this.uiManager.showGameComplete();
+            }, 5000); // Give user time to read scenario completion first
+        }
+    }
+    
+    // Method to handle continue/restart functionality
+    continueGame() {
+        // Reset current country and scenario
+        this.currentCountry = null;
+        this.currentScenario = null;
+        
+        // Return to country selection
+        this.uiManager.showCountrySelection();
+        
+        // Ensure competence profile is updated
+        if (this.uiManager.hasCompetenceSystem()) {
+            this.uiManager.updateCountrySelectionWithCompetence();
+        }
+    }
+    
+    // Extended reset method to handle game complete condition
+    reset() {
+        // Reset competence system if it exists
+        if (this.competenceSystem) {
+            this.competenceSystem.resetProgress();
+        }
+        
+        // Reset game state
+        this.playerScore = 0;
+        this.currentCountry = null;
+        this.currentScenario = null;
+        this.completedCountries = {};
+        
+        // Reset the UI
+        if (this.uiManager) {
+            this.uiManager.showCountrySelection();
+            this.uiManager.updateScoreDisplay(0);
         }
     }
     
@@ -479,6 +592,13 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         try {
             const game = new GlobalBusinessQuest();
+            
+            // Initialize game flow event listeners
+            game.initGameFlowEventListeners();
+            
+            // Attach game instance to window for debugging (optional, remove in production)
+            window.gameInstance = game;
+            
         } catch (error) {
             console.error("Failed to initialize game:", error);
             
