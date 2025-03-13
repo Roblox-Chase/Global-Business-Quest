@@ -1,11 +1,6 @@
 // Cultural Competence Tracking System
 // This module tracks and manages the player's cultural competence across countries
 
-// Cultural Competence Tracking System
-// This module tracks and manages the player's cultural competence across countries
-
-// Cultural Competence Tracking System
-// This module tracks and manages the player's cultural competence across countries
 
 export class CulturalCompetenceSystem {
     constructor() {
