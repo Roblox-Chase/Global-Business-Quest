@@ -3,35 +3,41 @@
 
 // Scenario class to handle individual business scenarios
 class Scenario {
-  constructor(id, title, description, scene, interactions) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.scene = scene;
-    this.interactions = interactions;
-    this.completed = false;
-    this.playerChoices = [];
-  }
+    constructor(id, title, description, scene, interactions) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.scene = scene;
+        this.interactions = interactions;
+        this.completed = false;
+        this.playerChoices = [];
+    }
 
   // Record player choice for analytics
   recordChoice(interactionId, optionSelected) {
-    this.playerChoices.push({
-      interactionId: interactionId,
-      selectedOption: optionSelected,
-      timestamp: new Date()
-    });
-  }
+        this.playerChoices.push({
+            interactionId: interactionId,
+            selectedOption: optionSelected,
+            timestamp: new Date()
+        });
+
+        // Debug log to verify choice recording
+        console.log("Choice Recorded:", optionSelected.text);
+    }
 
   // Calculate score based on correct choices
   calculateScore() {
-    let score = 0;
-    this.playerChoices.forEach(choice => {
-      if (choice.selectedOption.correct) {
-        score += 10;
-      }
-    });
-    return score;
-  }
+        let score = 0;
+        this.playerChoices.forEach(choice => {
+            if (choice.selectedOption.correct) {
+                score += 10;
+            }
+        });
+
+        // Debug log to verify score calculation
+        console.log("Calculated Score:", score);
+        return score;
+    }
 
   // Get progress percentage through scenario
   getProgress() {
@@ -41,15 +47,19 @@ class Scenario {
 
   // Mark scenario as completed
   complete() {
-    this.completed = true;
-    return this.calculateScore();
-  }
+        this.completed = true;
+        const score = this.calculateScore();
+
+        // Debug log to verify scenario completion
+        console.log("Scenario Completed:", this.title, "Score:", score);
+        return score;
+    }
 
   // Reset scenario for replay
-  reset() {
-    this.playerChoices = [];
-    this.completed = false;
-  }
+ reset() {
+        this.playerChoices = [];
+        this.completed = false;
+    }
 }
 
 // ScenarioManager class to handle all game scenarios
