@@ -401,29 +401,44 @@ class GlobalBusinessQuest {
         }
     }
     
-    startScenario(scenario) {
-        console.log("Starting scenario:", scenario.title);
-        this.currentScenario = scenario;
-        
-        try {
-            // Show scenario in UI
-            this.uiManager.showScenario(scenario);
-            
-            // Start with the first interaction
-            this.currentInteractionIndex = 0;
-            this.nextInteraction();
-        } catch (error) {
-            console.error("Error starting scenario:", error);
-            this.showErrorMessage(`Error starting scenario: ${error.message}`);
-        }
-    }
-    
-    nextInteraction() {
+   startScenario(scenario) {
+    console.log("Starting scenario:", scenario.title);
+
     try {
+        // Set the current scenario
+        this.currentScenario = scenario;
+
+        // Show scenario in UI
+        this.uiManager.showScenario(scenario);
+
+        // Start with the first interaction
+        this.currentInteractionIndex = 0;
+        this.nextInteraction();
+    } catch (error) {
+        console.error("Error starting scenario:", error);
+        this.showErrorMessage(`Error starting scenario: ${error.message}`);
+    }
+}
+    
+nextInteraction() {
+    try {
+        // Check if we have a valid scenario
+        if (!this.currentScenario) {
+            console.error("No current scenario found!");
+            this.showErrorMessage("No scenario is currently active.");
+            return;
+        }
+
+        // Debug log to verify the current scenario
+        console.log("Current Scenario:", this.currentScenario.title);
+
         // Check if we have more interactions
         if (this.currentInteractionIndex < this.currentScenario.interactions.length) {
             const interaction = this.currentScenario.interactions[this.currentInteractionIndex];
             this.currentInteraction = interaction;
+
+            // Debug log to verify the current interaction
+            console.log("Current Interaction:", interaction.prompt);
 
             // Show interaction in UI
             this.uiManager.showInteraction(interaction);
