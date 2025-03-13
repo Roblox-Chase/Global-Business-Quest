@@ -977,3 +977,4 @@ export class UIManager {
             }
         }, 8000);
     }
+}
